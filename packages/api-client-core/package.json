@@ -1,0 +1,48 @@
+{
+    "name": "@in.co.sandbox/api-client-core",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "homepage": "https://sandbox.co.in",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "test": "jest --passWithNoTests",
+        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
+        "build": "rollup -c",
+        "clean": "rimraf dist",
+        "lint": "eslint --fix .",
+        "lint:check": "eslint .",
+        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\""
+    },
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@in.co.sandbox/api-endpoints": "1.0.0",
+        "axios": "^1.6.2",
+        "class-transformer": "^0.5.1",
+        "form-data": "^4.0.2",
+        "jwt-decode": "^4.0.0"
+    }
+}

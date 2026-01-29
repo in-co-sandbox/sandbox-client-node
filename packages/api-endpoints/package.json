@@ -1,0 +1,37 @@
+{
+    "name": "@in.co.sandbox/api-endpoints",
+    "version": "1.0.0",
+    "description": "Endpoints for Sandbox APIs",
+    "main": "dist/index.js",
+    "type": "module",
+    "types": "dist/src/index.d.ts",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "homepage": "https://sandbox.co.in",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
+        "build": "rollup -c",
+        "clean": "rimraf dist",
+        "lint": "eslint --fix .",
+        "lint:check": "eslint .",
+        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\""
+    },
+    "typesVersions": {
+        "*": {
+            ".": [
+                "./dist/index.d.ts"
+            ]
+        }
+    },
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "org.quicko",
+        "directory": "packages/api-endpoints"
+    }
+}
