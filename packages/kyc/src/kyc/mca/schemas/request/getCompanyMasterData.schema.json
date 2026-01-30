@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "GetCompanyMasterDataRequest",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "consent": {
+            "type": "string"
+        },
+        "reason": {
+            "type": "string"
+        },
+        "\"@entity\"": {
+            "type": "string"
+        }
+    },
+    "required": ["@entity", "id", "consent", "reason"]
+}

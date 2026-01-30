@@ -1,0 +1,61 @@
+{
+    "name": "@in.co.sandbox/kyc-api-client",
+    "version": "1.0.0",
+    "description": "KYC SDK for the Sandbox API",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "homepage": "https://sandbox.co.in",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "test": "jest --passWithNoTests",
+        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
+        "build": "rollup -c",
+        "clean": "rimraf dist",
+        "lint": "eslint --fix .",
+        "lint:check": "eslint .",
+        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\""
+    },
+    "exports": {
+        "./aadhaar": {
+            "types": "./dist/src/kyc/aadhaar/index.d.ts",
+            "import": "./dist/aadhaar/index.js"
+        },
+        "./bank": {
+            "types": "./dist/src/kyc/bank/index.d.ts",
+            "import": "./dist/bank/index.js"
+        },
+        "./digilocker": {
+            "types": "./dist/src/kyc/digilocker/index.d.ts",
+            "import": "./dist/digilocker/index.js"
+        },
+        "./digilocker-sdk": {
+            "types": "./dist/src/kyc/digilocker-sdk/index.d.ts",
+            "import": "./dist/digilocker-sdk/index.js"
+        },
+        "./entitylocker": {
+            "types": "./dist/src/kyc/entitylocker/index.d.ts",
+            "import": "./dist/entitylocker/index.js"
+        },
+        "./entitylocker-sdk": {
+            "types": "./dist/src/kyc/entitylocker-sdk/index.d.ts",
+            "import": "./dist/entitylocker-sdk/index.js"
+        },
+        "./mca": {
+            "types": "./dist/src/kyc/mca/index.d.ts",
+            "import": "./dist/mca/index.js"
+        },
+        "./pan": {
+            "types": "./dist/src/kyc/pan/index.d.ts",
+            "import": "./dist/pan/index.js"
+        }
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@in.co.sandbox/api-client-core": "1.0.0",
+        "@in.co.sandbox/api-endpoints": "1.0.0"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "VerifyUserAccountRequest",
+    "type": "object",
+    "properties": {
+        "aadhaar_number": {
+            "type": "string"
+        },
+        "mobile": {
+            "type": "string"
+        },
+        "\"@entity\"": {
+            "type": "string",
+            "enum": ["in.co.sandbox.kyc.digilocker.user.verification.request"]
+        }
+    },
+    "required": ["@entity"],
+    "anyOf": [
+        {
+            "required": ["aadhaar_number"]
+        },
+        {
+            "required": ["mobile"]
+        }
+    ]
+}
