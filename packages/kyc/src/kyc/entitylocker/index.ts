@@ -1,7 +1,2 @@
-/**
- * EntityLocker SDK
- * Auto-generated - DO NOT EDIT
- */
-
-export { EntityLockerClient } from './client/EntityLockerClient';
-export * from './types';
+export * from './client/EntityLockerClient';
+export * from './schemas';

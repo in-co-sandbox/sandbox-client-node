@@ -1,7 +1,2 @@
-/**
- * MCA SDK
- * Auto-generated - DO NOT EDIT
- */
-
-export { MCAClient } from './client/MCAClient';
-export * from './types';
+export * from './client/MCAClient';
+export * from './schemas';

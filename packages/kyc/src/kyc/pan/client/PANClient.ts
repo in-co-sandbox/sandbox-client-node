@@ -12,53 +12,20 @@ import {
     Entity,
 } from '@in.co.sandbox/api-client-core';
 import { Endpoint as BaseEndpoint } from '@in.co.sandbox/api-endpoints';
-import ajv, { Ajv, ValidateFunction } from 'ajv';
-import type { VerifyPanRequest } from '../types/request/VerifyPanRequest';
-import VerifyPanRequestSchema from '../schemas/request/verifyPAN.schema.json';
-import type { VerifyPanAadhaarLinkStatusRequest } from '../types/request/VerifyPanAadhaarLinkStatusRequest';
-import VerifyPanAadhaarLinkStatusRequestSchema from '../schemas/request/verifyPANAadhaarLinkStatus.schema.json';
+import { ZodError } from 'zod';
+import { VerifyPanRequestSchema, type VerifyPanRequest } from '../schemas/request/VerifyPanRequest';
+import {
+    VerifyPanAadhaarLinkStatusRequestSchema,
+    type VerifyPanAadhaarLinkStatusRequest,
+} from '../schemas/request/VerifyPanAadhaarLinkStatusRequest';
 
 export class PANClient {
     private client: ApiClient;
     private credentials: ApiUserCredentials;
-    private ajv: Ajv;
-    private validators: Map<string, ValidateFunction> = new Map();
 
     constructor(credentials: ApiUserCredentials) {
         this.credentials = credentials;
-        this.ajv = new ajv({
-            allErrors: true,
-            validateSchema: true,
-            strictKeywords: 'log',
-            strictDefaults: 'log',
-            schemaId: '$id',
-            unknownFormats: 'ignore',
-        });
         this.client = new ApiClientBuilder().withCredentials(credentials).build(ApiClient);
-        this.initValidators();
-    }
-
-    private initValidators(): void {
-        this.validators.set('verifyPANRequest', this.ajv.compile(VerifyPanRequestSchema));
-        this.validators.set(
-            'verifyPANAadhaarLinkStatusRequest',
-            this.ajv.compile(VerifyPanAadhaarLinkStatusRequestSchema),
-        );
-    }
-
-    private validate<T>(schemaName: string, data: unknown): T {
-        const validate = this.validators.get(schemaName);
-        if (!validate) {
-            throw new SandboxException(`Validator not found for schema: ${schemaName}`, 500);
-        }
-        if (!validate(data)) {
-            const validationErrors = validate.errors || [];
-            const errorMessage = `Validation failed: ${JSON.stringify(validationErrors)}`;
-            const exception = new SandboxException(errorMessage, 400);
-            exception.setError({ validationErrors });
-            throw exception;
-        }
-        return data as T;
     }
 
     /**
@@ -72,7 +39,7 @@ export class PANClient {
      */
     public async verifyPAN(request: VerifyPanRequest, acceptCache: string): Promise<ApiResponse> {
         try {
-            this.validate<VerifyPanRequest>('verifyPANRequest', request);
+            VerifyPanRequestSchema.parse(request);
 
             const headers: Record<string, any> = {
                 'x-accept-cache': acceptCache,
@@ -84,6 +51,11 @@ export class PANClient {
         } catch (error) {
             if (error instanceof SandboxException) {
                 throw error;
+            }
+            if (error instanceof ZodError) {
+                throw new SandboxException(`Invalid request body: ${error.message}`, 400).setError({
+                    validationErrors: error.issues,
+                });
             }
             throw new SandboxException('Internal Server Error', 500);
         }
@@ -99,7 +71,7 @@ export class PANClient {
      */
     public async verifyPANAadhaarLinkStatus(request: VerifyPanAadhaarLinkStatusRequest): Promise<ApiResponse> {
         try {
-            this.validate<VerifyPanAadhaarLinkStatusRequest>('verifyPANAadhaarLinkStatusRequest', request);
+            VerifyPanAadhaarLinkStatusRequestSchema.parse(request);
 
             const endpoint = EndpointBuilder.build(
                 BaseEndpoint.get(this.credentials.getApiKey()),
@@ -110,6 +82,11 @@ export class PANClient {
         } catch (error) {
             if (error instanceof SandboxException) {
                 throw error;
+            }
+            if (error instanceof ZodError) {
+                throw new SandboxException(`Invalid request body: ${error.message}`, 400).setError({
+                    validationErrors: error.issues,
+                });
             }
             throw new SandboxException('Internal Server Error', 500);
         }

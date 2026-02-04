@@ -1,7 +1,2 @@
-/**
- * Digilocker SDK
- * Auto-generated - DO NOT EDIT
- */
-
-export { DigilockerClient } from './client/DigilockerClient';
-export * from './types';
+export * from './client/DigilockerClient';
+export * from './schemas';
