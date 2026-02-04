@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const VerifyOtpRequestSchema = z.object({
+    '@entity': z.literal('in.co.sandbox.kyc.aadhaar.okyc.request'),
     reference_id: z.string().describe('Reference ID received in the Generate OTP response'),
     otp: z
         .string()
@@ -8,7 +9,6 @@ export const VerifyOtpRequestSchema = z.object({
         .min(6)
         .max(6)
         .describe('OTP generated to mobile number associated with Aadhaar'),
-    '"@entity"': z.literal('in.co.sandbox.kyc.aadhaar.okyc.request').optional(),
 });
 
 export type VerifyOtpRequest = z.infer<typeof VerifyOtpRequestSchema>;
