@@ -59,7 +59,7 @@ export class EntityLockerSDKClient {
      * Session Status
      *
      *
-     * @param sessionId - SDK Session that is created in the &quot;Create Session API&quot;
+     * @param sessionId - Session identifier generated during EntityLocker SDK [Create Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker-sdk/endpoints/create_session) .
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
@@ -87,12 +87,15 @@ export class EntityLockerSDKClient {
      * Get Document
      *
      *
-     * @param sessionId - SDK Session that is created in the &quot;Create Session API&quot;
-     * @param docType - Document type of the document that is being fetched
+     * @param sessionId - Session identifier generated during EntityLocker SDK [Create Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker-sdk/endpoints/create_session) .
+     * @param docType - Document type identifying which EntityLocker document to retrieve. Must match one of the consented doc_types values.
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
-    public async getDocument(sessionId: string, docType: string): Promise<ApiResponse> {
+    public async getDocument(
+        sessionId: string,
+        docType: 'company_master_details' | 'gstn_details' | 'udhyam_certificate ',
+    ): Promise<ApiResponse> {
         try {
             const pathParams: Record<string, string> = {
                 session_id: String(sessionId),

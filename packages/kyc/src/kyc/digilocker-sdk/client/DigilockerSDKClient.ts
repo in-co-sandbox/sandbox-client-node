@@ -59,7 +59,7 @@ export class DigilockerSDKClient {
      * Session Status
      *
      *
-     * @param sessionId - SDK session created in Create Session API
+     * @param sessionId - Session identifier generated during DigiLocker SDK [Create Session API](https://developer.sandbox.co.in/api-reference/kyc/digilocker-sdk/endpoints/create-session) .
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
@@ -87,8 +87,8 @@ export class DigilockerSDKClient {
      * Get Document
      *
      *
-     * @param sessionId - SDK session created in Create Session API
-     * @param docType - Document you want to fetch
+     * @param sessionId - Session identifier generated during DigiLocker SDK [Create Session API](https://developer.sandbox.co.in/api-reference/kyc/digilocker-sdk/endpoints/create-session) .
+     * @param docType - Document type identifying which DigiLocker document to retrieve. Must match one of the consented doc_types values.
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */

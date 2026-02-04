@@ -33,7 +33,7 @@ export class MCAClient {
 
     /**
      * Company Master Data
-     * Fetch companies&#39;s details using CIN or LLPIN
+     * Fetch companies's details using CIN or LLPIN
      *
      * @param request - The request body
      * @returns Promise<ApiResponse>
@@ -64,7 +64,7 @@ export class MCAClient {
 
     /**
      * Director Master Data
-     * Fetch director&#39;s details using DIN
+     * Fetch director's details using DIN
      *
      * @param request - The request body
      * @returns Promise<ApiResponse>

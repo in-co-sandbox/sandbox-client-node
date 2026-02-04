@@ -59,7 +59,7 @@ export class EntityLockerClient {
      * Get session status
      *
      *
-     * @param sessionId - Session created in Initiate Session API
+     * @param sessionId - Session identifier generated during EntityLocker [Initiate Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker/endpoints/initiate_session) .
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
@@ -87,12 +87,15 @@ export class EntityLockerClient {
      * Fetch Document
      *
      *
-     * @param sessionId - Session created in Initiate Session API
-     * @param docType - Document you want to fetch
+     * @param sessionId - Session identifier generated during EntityLocker [Initiate Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker/endpoints/initiate_session) .
+     * @param docType - Document type identifying which EntityLocker document to retrieve. Must match one of the consented doc_types values.
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
-    public async getDocument(sessionId: string, docType: string): Promise<ApiResponse> {
+    public async getDocument(
+        sessionId: string,
+        docType: 'company_master_details' | 'gstn_details' | 'udhyam_certificate',
+    ): Promise<ApiResponse> {
         try {
             const pathParams: Record<string, string> = {
                 session_id: String(sessionId),
@@ -117,7 +120,7 @@ export class EntityLockerClient {
      * Get Entity Details
      *
      *
-     * @param sessionId - Session created in Initiate Session API
+     * @param sessionId - Session identifier generated during EntityLocker [Initiate Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker/endpoints/initiate_session) .
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
@@ -145,7 +148,7 @@ export class EntityLockerClient {
      * Get User Profile Details
      *
      *
-     * @param sessionId - Session created in Initiate Session API
+     * @param sessionId - Session identifier generated during EntityLocker [Initiate Session API](https://developer.sandbox.co.in/api-reference/kyc/entitylocker/endpoints/initiate_session) .
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */

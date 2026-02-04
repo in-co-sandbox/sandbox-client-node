@@ -13,7 +13,7 @@
         "dist/**/*"
     ],
     "scripts": {
-        "test": "jest --passWithNoTests",
+        "test": "vitest run",
         "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
         "build": "rollup -c",
         "clean": "rimraf dist",
@@ -60,5 +60,8 @@
     "dependencies": {
         "@in.co.sandbox/api-client-core": "*",
         "@in.co.sandbox/api-endpoints": "*"
+    },
+    "devDependencies": {
+        "vitest": "4.0.18"
     }
 }

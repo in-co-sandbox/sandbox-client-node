@@ -48,15 +48,15 @@ export class BankClient {
 
     /**
 	 * Bank Account Verification [Penny-Drop]
-	 * Bank account verification or penny drop check as is commonly referred to is a way to verify the authenticity of a customer&#39;s bank account. This operation can be used to verify a bank account and ifsc code combination. The operation will return a success response (billable) in two cases:
+	 * Bank account verification or penny drop check as is commonly referred to is a way to verify the authenticity of a customer's bank account. This operation can be used to verify a bank account and ifsc code combination. The operation will return a success response (billable) in two cases:
 
 1. The bank account or ifsc code or both are invalid
 2. The bank account and ifsc combination are verified
 	 *
 	 * @param ifsc - 11-digit alpha-numeric code used to identify the bank branches
 	 * @param accountNumber - Bank account number. Max length: 40 characters
-	 * @param name - &#x60;optional&#x60; Name. Max length: 100 characters
-	 * @param mobile - &#x60;optional&#x60; Mobile. Length: 10 digits
+	 * @param name - `optional` Name. Max length: 100 characters
+	 * @param mobile - `optional` Mobile. Length: 10 digits
 	 * @param acceptCache - Controls cache behavior for the request:
 true — Return cached response if available
 false — Bypass cache and fetch fresh data from origin
