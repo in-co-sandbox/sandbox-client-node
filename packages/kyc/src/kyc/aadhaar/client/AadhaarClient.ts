@@ -52,7 +52,9 @@ export class AadhaarClient {
                 validationException.setError({ validationErrors: error.issues });
                 throw validationException;
             }
-            throw new SandboxException('Internal Server Error', 500);
+            const unknownException = new SandboxException('Unexpected error occurred', 500);
+            unknownException.setError({ error });
+            throw unknownException;
         }
     }
 
@@ -83,7 +85,9 @@ export class AadhaarClient {
                 validationException.setError({ validationErrors: error.issues });
                 throw validationException;
             }
-            throw new SandboxException('Internal Server Error', 500);
+            const unknownException = new SandboxException('Unexpected error occurred', 500);
+            unknownException.setError({ error });
+            throw unknownException;
         }
     }
 }

@@ -42,7 +42,9 @@ export class BankClient {
             if (error instanceof SandboxException) {
                 throw error;
             }
-            throw new SandboxException('Internal Server Error', 500);
+            const unknownException = new SandboxException('Unexpected error occurred', 500);
+            unknownException.setError({ error });
+            throw unknownException;
         }
     }
 
@@ -96,7 +98,9 @@ Default: If omitted, returns fresh data from origin
             if (error instanceof SandboxException) {
                 throw error;
             }
-            throw new SandboxException('Internal Server Error', 500);
+            const unknownException = new SandboxException('Unexpected error occurred', 500);
+            unknownException.setError({ error });
+            throw unknownException;
         }
     }
 
@@ -147,7 +151,9 @@ Default: If omitted, returns fresh data from origin
             if (error instanceof SandboxException) {
                 throw error;
             }
-            throw new SandboxException('Internal Server Error', 500);
+            const unknownException = new SandboxException('Unexpected error occurred', 500);
+            unknownException.setError({ error });
+            throw unknownException;
         }
     }
 }
