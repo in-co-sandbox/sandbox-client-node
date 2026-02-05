@@ -37,7 +37,7 @@ export class PANClient {
      * @returns Promise<ApiResponse>
      * @throws SandboxException if the API call fails or validation fails
      */
-    public async verifyPAN(request: VerifyPanRequest, acceptCache: string): Promise<ApiResponse> {
+    public async verifyPAN(request: VerifyPanRequest, acceptCache?: boolean): Promise<ApiResponse> {
         try {
             VerifyPanRequestSchema.parse(request);
 

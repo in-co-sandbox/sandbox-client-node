@@ -124,7 +124,7 @@ Default: If omitted, returns fresh data from origin
         accountNumber: string,
         name: string,
         mobile: string,
-        acceptCache: boolean,
+        acceptCache?: boolean,
     ): Promise<ApiResponse> {
         try {
             const headers: Record<string, any> = {

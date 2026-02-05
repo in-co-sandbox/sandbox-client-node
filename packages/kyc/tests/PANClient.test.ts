@@ -36,7 +36,7 @@ describe('PANClient', () => {
                 consent: CONSENT,
                 reason: REASON,
             };
-            const acceptCache = 'eiusmod qui Ut';
+            const acceptCache = false;
 
             const result = await client.verifyPAN(request, acceptCache);
 
