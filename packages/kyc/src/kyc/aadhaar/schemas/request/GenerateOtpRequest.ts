@@ -4,7 +4,7 @@ export const GenerateOtpRequestSchema = z.object({
     '@entity': z.literal('in.co.sandbox.kyc.aadhaar.okyc.otp.request'),
     aadhaar_number: z
         .string()
-        .regex(new RegExp('[0-9]'))
+        .regex(new RegExp('^[0-9]{12}$'))
         .min(12)
         .max(12)
         .describe(
