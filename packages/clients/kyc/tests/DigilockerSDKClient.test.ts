@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiUserCredentials } from '@in.co.sandbox/api-client-core';
+import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
 import { DigilockerSDKClient } from '../src/kyc/digilocker-sdk/client/DigilockerSDKClient';
 import { CreateSessionRequest } from '../src/kyc/digilocker-sdk/schemas/request/CreateSessionRequest';
 

@@ -1,4 +1,4 @@
-import { Endpoint as BaseEndpoint } from '@in.co.sandbox/api-endpoints';
+import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
 import axios, {
     AxiosError,
     AxiosHeaders,

@@ -10,8 +10,8 @@ import {
     EndpointBuilder,
     SandboxException,
     Entity,
-} from '@in.co.sandbox/api-client-core';
-import { Endpoint as BaseEndpoint } from '@in.co.sandbox/api-endpoints';
+} from '@in-co-sandbox/api-client-core';
+import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
 import { ZodError } from 'zod';
 import { GenerateOtpRequestSchema, type GenerateOtpRequest } from '../schemas/request/GenerateOtpRequest';
 import { VerifyOtpRequestSchema, type VerifyOtpRequest } from '../schemas/request/VerifyOtpRequest';

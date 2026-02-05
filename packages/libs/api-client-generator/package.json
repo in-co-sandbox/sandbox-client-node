@@ -1,5 +1,5 @@
 {
-	"name": "@in.co.sandbox/api-client-generator",
+	"name": "@in-co-sandbox/api-client-generator",
 	"version": "1.0.0",
 	"type": "module",
 	"main": "dist/index.js",

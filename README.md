@@ -6,9 +6,9 @@ The official repository of SDKs to communicate with Sandbox APIs. This is a mono
 
 This monorepo contains the following packages:
 
-- **`@in.co.sandbox/api-client-core`** - Core functionality for API clients including authentication, session management, and base client implementations
-- **`@in.co.sandbox/api-endpoints`** - Endpoint definitions and builders
-- **`@in.co.sandbox/kyc-api-client`** - KYC (Know Your Customer) SDK with support for:
+- **`@in-co-sandbox/api-client-core`** - Core functionality for API clients including authentication, session management, and base client implementations
+- **`@in-co-sandbox/api-endpoints`** - Endpoint definitions and builders
+- **`@in-co-sandbox/kyc-api-client`** - KYC (Know Your Customer) SDK with support for:
   - Aadhaar verification
   - Bank account verification
   - PAN verification

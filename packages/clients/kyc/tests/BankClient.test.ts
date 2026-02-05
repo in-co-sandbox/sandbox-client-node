@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiUserCredentials } from '@in.co.sandbox/api-client-core';
+import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
 import { BankClient } from '../src/kyc/bank/client/BankClient';
 
 describe('BankClient', () => {
