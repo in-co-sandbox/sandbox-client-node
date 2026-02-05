@@ -48,9 +48,9 @@ export class AadhaarClient {
                 throw error;
             }
             if (error instanceof ZodError) {
-                throw new SandboxException(`Invalid request body: ${error.message}`, 400).setError({
-                    validationErrors: error.issues,
-                });
+                const validationException = new SandboxException(`Invalid request body: ${error.message}`, 400);
+                validationException.setError({ validationErrors: error.issues });
+                throw validationException;
             }
             throw new SandboxException('Internal Server Error', 500);
         }
@@ -79,9 +79,9 @@ export class AadhaarClient {
                 throw error;
             }
             if (error instanceof ZodError) {
-                throw new SandboxException(`Invalid request body: ${error.message}`, 400).setError({
-                    validationErrors: error.issues,
-                });
+                const validationException = new SandboxException(`Invalid request body: ${error.message}`, 400);
+                validationException.setError({ validationErrors: error.issues });
+                throw validationException;
             }
             throw new SandboxException('Internal Server Error', 500);
         }

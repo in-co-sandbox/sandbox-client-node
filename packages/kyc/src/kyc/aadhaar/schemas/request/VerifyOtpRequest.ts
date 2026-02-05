@@ -9,7 +9,7 @@ export const VerifyOtpRequestSchema = z.object({
         ),
     otp: z
         .string()
-        .regex(new RegExp('[0-9]'))
+        .regex(new RegExp('^[0-9]{6}$'))
         .min(6)
         .max(6)
         .describe(

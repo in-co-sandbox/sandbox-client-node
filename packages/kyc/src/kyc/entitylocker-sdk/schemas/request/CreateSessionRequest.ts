@@ -9,7 +9,7 @@ export const CreateSessionRequestSchema = z
                 'EntityLocker authentication flow to initiate for the user. Use `signin` for existing EntityLocker users or `signup` to create a new account.',
             ),
         doc_types: z
-            .array(z.enum(['company_master_details', 'gstn_details', 'udhyam_certificate ']))
+            .array(z.enum(['company_master_details', 'gstn_details', 'udhyam_certificate']))
             .min(1)
             .describe('List of EntityLocker document types for which user consent is being requested.'),
     })
