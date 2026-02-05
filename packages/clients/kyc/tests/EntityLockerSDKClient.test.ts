@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiUserCredentials } from '@in.co.sandbox/api-client-core';
+import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
 import { EntityLockerSDKClient } from '../src/kyc/entitylocker-sdk/client/EntityLockerSDKClient';
 import { CreateSessionRequest } from '../src/kyc/entitylocker-sdk/schemas/request/CreateSessionRequest';
 

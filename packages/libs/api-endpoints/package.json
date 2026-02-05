@@ -1,5 +1,5 @@
 {
-    "name": "@in.co.sandbox/api-endpoints",
+    "name": "@in-co-sandbox/api-endpoints",
     "version": "1.0.0",
     "description": "Endpoints for Sandbox APIs",
     "main": "dist/index.js",

@@ -9,8 +9,8 @@ import {
     ApiUserCredentials,
     EndpointBuilder,
     SandboxException,
-} from '@in.co.sandbox/api-client-core';
-import { Endpoint as BaseEndpoint } from '@in.co.sandbox/api-endpoints';
+} from '@in-co-sandbox/api-client-core';
+import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
 
 export class BankClient {
     private client: ApiClient;

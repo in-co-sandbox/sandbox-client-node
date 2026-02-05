@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiUserCredentials } from '@in.co.sandbox/api-client-core';
+import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
 import { AadhaarClient } from '../src/kyc/aadhaar/client/AadhaarClient';
 import { GenerateOtpRequest } from '../src/kyc/aadhaar/schemas/request/GenerateOtpRequest';
 import { VerifyOtpRequest } from '../src/kyc/aadhaar/schemas/request/VerifyOtpRequest';

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiUserCredentials } from '@in.co.sandbox/api-client-core';
+import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
 import { MCAClient } from '../src/kyc/mca/client/MCAClient';
 import { GetCompanyMasterDataRequest } from '../src/kyc/mca/schemas/request/GetCompanyMasterDataRequest';
 import { GetDirectorMasterDataRequest } from '../src/kyc/mca/schemas/request/GetDirectorMasterDataRequest';
