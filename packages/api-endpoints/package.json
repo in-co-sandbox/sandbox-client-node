@@ -24,7 +24,7 @@
     "typesVersions": {
         "*": {
             ".": [
-                "./dist/index.d.ts"
+                "./dist/src/index.d.ts"
             ]
         }
     },

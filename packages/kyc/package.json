@@ -25,35 +25,35 @@
     "exports": {
         "./aadhaar": {
             "types": "./dist/src/kyc/aadhaar/index.d.ts",
-            "import": "./dist/aadhaar/index.js"
+            "import": "./dist/src/kyc/aadhaar/index.js"
         },
         "./bank": {
             "types": "./dist/src/kyc/bank/index.d.ts",
-            "import": "./dist/bank/index.js"
+            "import": "./dist/src/kyc/bank/index.js"
         },
         "./digilocker": {
             "types": "./dist/src/kyc/digilocker/index.d.ts",
-            "import": "./dist/digilocker/index.js"
+            "import": "./dist/src/kyc/digilocker/index.js"
         },
         "./digilocker-sdk": {
             "types": "./dist/src/kyc/digilocker-sdk/index.d.ts",
-            "import": "./dist/digilocker-sdk/index.js"
+            "import": "./dist/src/kyc/digilocker-sdk/index.js"
         },
         "./entitylocker": {
             "types": "./dist/src/kyc/entitylocker/index.d.ts",
-            "import": "./dist/entitylocker/index.js"
+            "import": "./dist/src/kyc/entitylocker/index.js"
         },
         "./entitylocker-sdk": {
             "types": "./dist/src/kyc/entitylocker-sdk/index.d.ts",
-            "import": "./dist/entitylocker-sdk/index.js"
+            "import": "./dist/src/kyc/entitylocker-sdk/index.js"
         },
         "./mca": {
             "types": "./dist/src/kyc/mca/index.d.ts",
-            "import": "./dist/mca/index.js"
+            "import": "./dist/src/kyc/mca/index.js"
         },
         "./pan": {
             "types": "./dist/src/kyc/pan/index.d.ts",
-            "import": "./dist/pan/index.js"
+            "import": "./dist/src/kyc/pan/index.js"
         }
     },
     "license": "ISC",

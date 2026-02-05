@@ -1,48 +1,48 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { globSync } from "glob";
 import dts from "rollup-plugin-dts";
 import esbuild from "rollup-plugin-esbuild";
-import json from "@rollup/plugin-json";
+import { globSync } from "glob";
 import { nodeExternals } from "rollup-plugin-node-externals";
 
-// We are giving individual entry points for each index.ts file.
-// Because there are files having same name in different folders.
-// Giving a single entry point will only parse the first one and ignore the rest.
-// Doing it this way ensures that all the files are parsed.
-const getAllIndexFiles = () => globSync("{src/**/index.ts,generated/**/index.ts}");
+// Get all index.ts files in the project
+const getAllIndexFiles = () => globSync("src/**/index.ts");
+
+// Get files for JS build (excluding interfaces) - interfaces are not needed
+// in the output. i.e. we are excluding the interface folder since they do
+// not emit the corresponding .js files.
+const getJSBuildFiles = () =>
+    globSync("src/**/index.ts", { ignore: "src/interface/**" });
 
 // Main build configuration
-const mainConfig = {
-    input: getAllIndexFiles(),
-    plugins: [
-        json(),
-        nodeExternals({
-            packagePath: "./package.json",
-        }),
-        esbuild({
-            target: "esnext",
-        }),
-    ],
-    output: {
-        dir: "dist/",
-        preserveModules: true,
-        format: "esm",
+export default [
+    {
+        input: getJSBuildFiles(),
+        plugins: [
+            nodeExternals({
+                packagePath: "./package.json",
+            }),
+            esbuild({
+                target: "esnext",
+            }),
+        ],
+        output: {
+            dir: "dist/",
+            format: "esm",
+            preserveModules: true,
+            preserveModulesRoot: "",
+        },
     },
-};
-
-// TypeScript declaration files configuration
-const dtsConfig = {
-    input: getAllIndexFiles(),
-    output: {
-        dir: "dist/",
-        preserveModules: true,
+    {
+        input: getAllIndexFiles(),
+        plugins: [
+            nodeExternals({
+                packagePath: "./package.json",
+            }),
+            dts(),
+        ],
+        output: {
+            dir: "dist/",
+            preserveModules: true,
+            preserveModulesRoot: "",
+        },
     },
-    plugins: [
-        nodeExternals({
-            packagePath: "./package.json",
-        }),
-        dts(),
-    ],
-};
-
-export default [mainConfig, dtsConfig];
+];
