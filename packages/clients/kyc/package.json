@@ -1,0 +1,69 @@
+{
+    "name": "@in.co.sandbox/kyc-api-client",
+    "version": "1.0.0",
+    "description": "KYC SDK for the Sandbox API",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "homepage": "https://sandbox.co.in",
+    "files": [
+        "dist/**/*"
+    ],
+    "scripts": {
+        "test": "vitest run",
+        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
+        "build": "rollup -c",
+        "clean": "rimraf dist",
+        "lint": "eslint --fix .",
+        "lint:check": "eslint .",
+        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "generate": "npx openapi-to-client ./resources/json/in-co-sandbox-kyc.openapi.json -o generated --generate-tests"
+    },
+    "exports": {
+        "./aadhaar": {
+            "types": "./dist/src/kyc/aadhaar/index.d.ts",
+            "import": "./dist/src/kyc/aadhaar/index.js"
+        },
+        "./bank": {
+            "types": "./dist/src/kyc/bank/index.d.ts",
+            "import": "./dist/src/kyc/bank/index.js"
+        },
+        "./digilocker": {
+            "types": "./dist/src/kyc/digilocker/index.d.ts",
+            "import": "./dist/src/kyc/digilocker/index.js"
+        },
+        "./digilocker-sdk": {
+            "types": "./dist/src/kyc/digilocker-sdk/index.d.ts",
+            "import": "./dist/src/kyc/digilocker-sdk/index.js"
+        },
+        "./entitylocker": {
+            "types": "./dist/src/kyc/entitylocker/index.d.ts",
+            "import": "./dist/src/kyc/entitylocker/index.js"
+        },
+        "./entitylocker-sdk": {
+            "types": "./dist/src/kyc/entitylocker-sdk/index.d.ts",
+            "import": "./dist/src/kyc/entitylocker-sdk/index.js"
+        },
+        "./mca": {
+            "types": "./dist/src/kyc/mca/index.d.ts",
+            "import": "./dist/src/kyc/mca/index.js"
+        },
+        "./pan": {
+            "types": "./dist/src/kyc/pan/index.d.ts",
+            "import": "./dist/src/kyc/pan/index.js"
+        }
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@in.co.sandbox/api-client-core": "*",
+        "@in.co.sandbox/api-endpoints": "*"
+    },
+    "devDependencies": {
+        "@in.co.sandbox/api-client-generator": "*",
+        "vitest": "4.0.18"
+    }
+}

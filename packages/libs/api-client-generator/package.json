@@ -1,0 +1,49 @@
+{
+	"name": "@in.co.sandbox/api-client-generator",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "dist/index.js",
+	"description": "OpenAPI client SDK generator with runtime validation for in-co-sandbox API",
+	"bin": {
+		"openapi-to-client": "dist/index.js"
+	},
+	"license": "ISC",
+	"scripts": {
+		"clean": "rm -rf dist",
+		"format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+		"format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\" && eslint .",
+		"lint": "eslint --fix .",
+		"lint:check": "eslint .",
+		"prebuild": "npm run clean && npm run format:check && tsc --noEmit",
+		"build": "rollup -c",
+		"postbuild": "copyfiles -u 1 ./templates/**/* dist/templates/",
+		"build-release": "npm run build && npm ci --omit=dev"
+	},
+	"dependencies": {
+		"change-case": "^5.4.4",
+		"json-schema-faker": "^0.5.9",
+		"json-schema-to-zod": "^2.7.0",
+		"mustache": "^4.2.0"
+	},
+	"devDependencies": {
+		"copyfiles": "^2.4.1",
+		"@rollup/plugin-commonjs": "^28.0.3",
+		"@rollup/plugin-json": "^6.1.0",
+		"@rollup/plugin-node-resolve": "^16.0.1",
+		"@types/mustache": "^4.2.5",
+		"@types/node": "^22.7.0",
+		"@typescript-eslint/eslint-plugin": "^8.46.3",
+		"@typescript-eslint/parser": "^8.46.3",
+		"eslint": "^9.39.1",
+		"eslint-plugin-import": "^2.32.0",
+		"eslint-plugin-prettier": "^5.5.4",
+		"glob": "^11.0.3",
+		"openapi-types": "^12.1.3",
+		"prettier": "^3.6.2",
+		"rollup": "^4.50.1",
+		"rollup-plugin-dts": "^6.2.1",
+		"rollup-plugin-esbuild": "^6.2.1",
+		"rollup-plugin-node-externals": "^8.1.1",
+		"typescript": "^5.9.2"
+	}
+}
