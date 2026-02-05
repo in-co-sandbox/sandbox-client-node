@@ -59,11 +59,11 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@in.co.sandbox/api-client-core": "*",
-        "@in.co.sandbox/api-endpoints": "*"
+        "@in.co.sandbox/api-client-core": "1.0.0",
+        "@in.co.sandbox/api-endpoints": "1.0.0"
     },
     "devDependencies": {
-        "@in.co.sandbox/api-client-generator": "*",
+        "@in.co.sandbox/api-client-generator": "1.0.0",
         "vitest": "4.0.18"
     }
 }
