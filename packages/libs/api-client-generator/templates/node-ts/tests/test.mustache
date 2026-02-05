@@ -1,0 +1,48 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import { ApiUserCredentials } from "@in.co.sandbox/api-client-core";
+import { {{clientName}} } from "{{{clientPath}}}";
+{{#requestImports}}
+import { {{typeName}} } from "{{{schemasPath}}}/{{typeName}}";
+{{/requestImports}}
+
+describe("{{clientName}}", () => {
+	// Test constants
+{{#testConstants}}
+	const {{{name}}} = {{{value}}};
+{{/testConstants}}
+
+	// API Credentials - Replace with actual values
+	const API_KEY = "";
+	const API_SECRET = "";
+
+	let client: {{clientName}};
+
+	beforeEach(() => {
+		const credentials = new ApiUserCredentials(API_KEY, API_SECRET);
+		client = new {{clientName}}(credentials);
+	});
+
+{{#operations}}
+	describe("{{methodName}}", () => {
+		it("should hit {{#summary}}{{summary}}{{/summary}}{{^summary}} successfully{{/summary}} api and return defined result", async () => {
+{{#parameters}}
+{{#isRequestBody}}
+			const {{name}}: {{type}} = {
+{{#requestBodyProperties}}
+				'{{{propertyName}}}': {{{propertyValue}}}{{^last}},{{/last}}
+{{/requestBodyProperties}}
+			};
+{{/isRequestBody}}
+{{^isRequestBody}}
+			const {{name}} = {{{exampleValue}}};
+{{/isRequestBody}}
+{{/parameters}}
+
+			const result = await client.{{methodName}}({{#parameters}}{{name}}{{^last}}, {{/last}}{{/parameters}});
+
+			expect(result).toBeDefined();
+		}, {{testTimeout}});
+	});
+
+{{/operations}}
+});

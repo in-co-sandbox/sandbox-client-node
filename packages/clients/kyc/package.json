@@ -20,7 +20,8 @@
         "lint": "eslint --fix .",
         "lint:check": "eslint .",
         "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
-        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\""
+        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
+        "generate": "npx openapi-to-client ./resources/json/in-co-sandbox-kyc.openapi.json -o generated --generate-tests"
     },
     "exports": {
         "./aadhaar": {
@@ -62,6 +63,7 @@
         "@in.co.sandbox/api-endpoints": "*"
     },
     "devDependencies": {
+        "@in.co.sandbox/api-client-generator": "*",
         "vitest": "4.0.18"
     }
 }

@@ -1,0 +1,119 @@
+/**
+ * {{#name}}{{name}}{{/name}}{{^name}}{{tag}}{{/name}} Client
+ * Auto-generated - DO NOT EDIT
+ */
+import { ApiClient, ApiClientBuilder, ApiResponse, ApiUserCredentials, EndpointBuilder, SandboxException{{#hasAnyRequestBody}}, Entity{{/hasAnyRequestBody}} } from "@in.co.sandbox/api-client-core";
+import { Endpoint as BaseEndpoint } from "@in.co.sandbox/api-endpoints";
+{{#hasAnyRequestBody}}
+import { ZodError } from "zod";
+{{/hasAnyRequestBody}}
+{{#operations}}
+{{#hasRequestBody}}
+import { {{pascalOperationId}}RequestSchema, type {{pascalOperationId}}Request } from "../schemas/request/{{pascalOperationId}}Request";
+{{/hasRequestBody}}
+{{/operations}}
+
+export class {{#name}}{{name}}{{/name}}{{^name}}{{tag}}{{/name}}Client {
+	private client: ApiClient;
+	private credentials: ApiUserCredentials;
+
+	constructor(credentials: ApiUserCredentials) {
+		this.credentials = credentials;
+		this.client = new ApiClientBuilder()
+			.withCredentials(credentials)
+			.build(ApiClient);
+	}
+
+{{#operations}}
+	/**
+	 * {{summary}}
+	 * {{{description}}}
+	 *
+{{#pathParams}}
+	 * @param {{name}} - {{{description}}}
+{{/pathParams}}
+{{#queryParams}}
+	 * @param {{name}} - {{{description}}}
+{{/queryParams}}
+{{#hasRequestBody}}
+	 * @param request - The request body
+{{/hasRequestBody}}
+{{#headerParams}}
+	 * @param {{name}} - {{{description}}}
+{{/headerParams}}
+	 * @returns Promise<{{#isGet}}ApiResponse{{/isGet}}{{#isPostForGet}}ApiResponse{{/isPostForGet}}{{#isPost}}void{{/isPost}}{{#isPut}}void{{/isPut}}{{#isPatch}}void{{/isPatch}}{{#isDelete}}void{{/isDelete}}>
+	 * @throws SandboxException if the API call fails or validation fails
+	 */
+	public async {{operationId}}({{#functionParams}}{{name}}{{#optional}}?{{/optional}}: {{{type}}}{{^last}}, {{/last}}{{/functionParams}}): Promise<{{#isGet}}ApiResponse{{/isGet}}{{#isPostForGet}}ApiResponse{{/isPostForGet}}{{#isPost}}void{{/isPost}}{{#isPut}}void{{/isPut}}{{#isPatch}}void{{/isPatch}}{{#isDelete}}void{{/isDelete}}> {
+		try {
+{{#hasRequestBody}}
+			{{pascalOperationId}}RequestSchema.parse(request);
+{{/hasRequestBody}}
+{{#hasHeaderParams}}
+
+			const headers: Record<string, any> = {
+{{#headerParams}}
+				"{{originalName}}": {{name}}{{^last}},{{/last}}
+{{/headerParams}}
+			};
+{{/hasHeaderParams}}
+{{#hasPathParams}}
+
+			const pathParams: Record<string, string> = {
+{{#pathParams}}
+				"{{originalName}}": String({{name}}),
+{{/pathParams}}
+			};
+{{/hasPathParams}}
+{{#hasQueryParams}}
+
+			const queryParams: Record<string, any> = {
+{{#queryParams}}
+				"{{originalName}}": {{name}}{{^last}},{{/last}}
+{{/queryParams}}
+			};
+{{/hasQueryParams}}
+
+			const endpoint = EndpointBuilder.build(
+				BaseEndpoint.get(this.credentials.getApiKey()),
+				"{{{path}}}"
+			);
+
+{{#isGet}}
+			return await this.client.get(endpoint{{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isGet}}
+{{#isPostForGet}}
+			return await this.client.postForGet(endpoint, new Entity(request){{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isPostForGet}}
+{{#isPost}}
+			await this.client.post(endpoint, new Entity(request){{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isPost}}
+{{#isPut}}
+			await this.client.put(endpoint, new Entity(request){{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isPut}}
+{{#isPatch}}
+			await this.client.patch(endpoint, new Entity(request){{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isPatch}}
+{{#isDelete}}
+			await this.client.delete(endpoint{{#hasQueryParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, {{#hasPathParams}}pathParams{{/hasPathParams}}{{^hasPathParams}}undefined{{/hasPathParams}}, queryParams{{/hasQueryParams}}{{^hasQueryParams}}{{#hasPathParams}}, {{#hasHeaderParams}}headers{{/hasHeaderParams}}{{^hasHeaderParams}}undefined{{/hasHeaderParams}}, pathParams{{/hasPathParams}}{{^hasPathParams}}{{#hasHeaderParams}}, headers{{/hasHeaderParams}}{{/hasPathParams}}{{/hasQueryParams}});
+{{/isDelete}}
+
+		} catch (error) {
+			if (error instanceof SandboxException) {
+				throw error;
+			}
+{{#hasRequestBody}}
+			if (error instanceof ZodError) {
+				const validationException = new SandboxException(`Invalid request body: ${error.message}`, 400);
+				validationException.setError({ validationErrors: error.issues });
+				throw validationException;
+			}
+{{/hasRequestBody}}
+			const unknownException = new SandboxException('Unexpected error occurred', 500);
+			unknownException.setError({ error });
+			throw unknownException;
+		}
+	}
+
+{{/operations}}
+}

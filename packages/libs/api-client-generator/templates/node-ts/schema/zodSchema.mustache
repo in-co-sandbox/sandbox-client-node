@@ -1,0 +1,5 @@
+import { z } from "zod";
+
+export const {{schemaName}} = {{{zodSchema}}};
+
+export type {{typeName}} = z.infer<typeof {{schemaName}}>;
