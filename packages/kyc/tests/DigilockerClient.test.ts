@@ -50,7 +50,7 @@ describe('DigilockerClient', () => {
             };
 
             const result = await client.initiateSession(request);
-            console.log(result);
+
             expect(result).toBeDefined();
         }, 30000);
     });

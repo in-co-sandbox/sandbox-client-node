@@ -49,15 +49,15 @@ export class ApiClient {
         credentials: ApiUserCredentials,
         timeout: number,
         enableDebugging: boolean,
-        reuqestInterceptors: Array<
+        requestInterceptors: Array<
             (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
         >,
     ) {
         this.credentials = credentials;
         this.client = axios.create({ timeout: timeout * 1000 });
 
-        if (reuqestInterceptors != null) {
-            reuqestInterceptors.forEach((interceptor) => {
+        if (requestInterceptors != null) {
+            requestInterceptors.forEach((interceptor) => {
                 this.client.interceptors.request.use(interceptor);
             });
         }
