@@ -69,8 +69,8 @@ Default: If omitted, returns fresh data from origin
     public async verifyBankUsingPennyDrop(
         ifsc: string,
         accountNumber: string,
-        name: string,
-        mobile: string,
+        name?: string,
+        mobile?: string,
         acceptCache?: boolean,
     ): Promise<ApiResponse> {
         try {
@@ -122,8 +122,8 @@ Default: If omitted, returns fresh data from origin
     public async verifyBankUsingPennyLess(
         ifsc: string,
         accountNumber: string,
-        name: string,
-        mobile: string,
+        name?: string,
+        mobile?: string,
         acceptCache?: boolean,
     ): Promise<ApiResponse> {
         try {
