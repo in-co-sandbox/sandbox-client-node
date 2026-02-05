@@ -98,7 +98,7 @@ export class EntityLockerSDKClient {
      */
     public async getDocument(
         sessionId: string,
-        docType: 'company_master_details' | 'gstn_details' | 'udhyam_certificate ',
+        docType: 'company_master_details' | 'gstn_details' | 'udhyam_certificate',
     ): Promise<ApiResponse> {
         try {
             const pathParams: Record<string, string> = {
