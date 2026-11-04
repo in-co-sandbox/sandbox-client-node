@@ -32,8 +32,6 @@ export class ApiClientBuilder {
 
     private enableLogging: boolean = ApiClientBuilder.ENABLE_LOGGING;
 
-    private auth: ApiClientOptions['auth'];
-
     private host: string | undefined;
 
     /** Interceptors that run after authentication, on every request. */
@@ -49,7 +47,6 @@ export class ApiClientBuilder {
         const credentials = this.credentialProvider?.getCredentials();
         if (!credentials) throw new SandboxException('Credentials are required to build the ApiClient');
         return new ClientClass(credentials, this.timeout, this.enableLogging, this.requestInterceptors, {
-            auth: this.auth,
             host: this.host,
         });
     }
@@ -104,16 +101,6 @@ export class ApiClientBuilder {
      */
     public withHost(host: string): ApiClientBuilder {
         this.host = host;
-        return this;
-    }
-
-    /**
-     * Replaces the default authentication.
-     *
-     * @param auth - The interceptor that authenticates each request, or `false` to send requests unauthenticated.
-     */
-    public withAuth(auth: RequestInterceptor | false): ApiClientBuilder {
-        this.auth = auth;
         return this;
     }
 }

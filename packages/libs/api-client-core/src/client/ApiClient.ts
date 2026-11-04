@@ -18,14 +18,6 @@ import type { RequestInterceptor } from './interceptor/RequestInterceptor';
 /** Options for {@link ApiClient}, usually set through `ApiClientBuilder`. */
 export interface ApiClientOptions {
     /**
-     * How requests are authenticated.
-     * - Omitted: an {@link AuthRequestInterceptor} with the client's credentials.
-     * - An interceptor: used instead of the default one.
-     * - `false`: no authentication.
-     */
-    auth?: RequestInterceptor | false;
-
-    /**
      * The API host for this client, such as `https://uat1-api.sandbox.co.in`.
      * Omitted: `Endpoint.get(apiKey)`, which honours `SANDBOX_API_HOST`.
      */
@@ -36,7 +28,7 @@ export interface ApiClientOptions {
  * A client for interacting with the API.
  *
  * This class provides methods for making HTTP requests (GET, POST, DELETE) to the API endpoints.
- * It authenticates requests with an {@link AuthRequestInterceptor} unless {@link ApiClientOptions.auth} says otherwise.
+ * It authenticates every request with an {@link AuthRequestInterceptor}.
  */
 export class ApiClient {
     /** The user agent sent with every request. */
@@ -59,7 +51,7 @@ export class ApiClient {
      * @param timeout - The connection timeout in seconds.
      * @param enableDebugging - Whether to log every request and response.
      * @param requestInterceptors - Interceptors that run after authentication, on every request.
-     * @param options - The host and how requests are authenticated; see {@link ApiClientOptions}.
+     * @param options - The host; see {@link ApiClientOptions}.
      */
     constructor(
         credentials: ApiUserCredentials,
@@ -75,8 +67,7 @@ export class ApiClient {
         // Axios runs request interceptors last-registered first: logging, then auth, then the caller's.
         requestInterceptors?.forEach((interceptor) => this.client.interceptors.request.use(interceptor));
 
-        const auth = options.auth ?? new AuthRequestInterceptor(credentials, timeout, this.baseUrl).intercept;
-        if (auth) this.client.interceptors.request.use(auth);
+        this.client.interceptors.request.use(new AuthRequestInterceptor(credentials, timeout, this.baseUrl).intercept);
 
         if (enableDebugging) {
             this.client.interceptors.request.use(this.requestLoggingInterceptor.bind(this));

@@ -48,12 +48,7 @@ const prod = new ApiClientBuilder().withCredentials(prodKeys).withHost(Endpoint.
 
 ### Authentication
 
-`ApiClient` authenticates every request with an `AuthRequestInterceptor` built from its credentials. To change that:
-
-```ts
-new ApiClientBuilder().withCredentials(credentials).withAuth(myInterceptor).build(ApiClient); // your own
-new ApiClientBuilder().withCredentials(credentials).withAuth(false).build(ApiClient); // none
-```
+Every client signs in at its host with its API key and secret on the first request, caches the access token, and signs in again once it expires. To send a token you already have, such as an end user's, set the `Authorization` header on the call.
 
 `withRequestInterceptors([...])` adds interceptors that run after authentication.
 

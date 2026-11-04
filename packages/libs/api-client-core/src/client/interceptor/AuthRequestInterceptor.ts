@@ -29,7 +29,7 @@ interface SignInErrorBody {
  *   signs in again once the token expires.
  * - With an `Authorization` header, it keeps a resource owner's token and refreshes an expired API user token.
  *
- * `ApiClient` attaches one by default. Pass your own to `ApiClientBuilder.withAuth` to replace it.
+ * `ApiClient` attaches one to every client, signing in at the client's host.
  */
 export class AuthRequestInterceptor {
     /** The user agent sent with every request. */

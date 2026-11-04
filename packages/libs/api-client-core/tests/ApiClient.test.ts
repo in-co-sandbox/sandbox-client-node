@@ -75,29 +75,6 @@ describe('ApiClient authentication', () => {
         await expect(client.get(`${api.url}/one`)).rejects.toMatchObject({ code: 401 });
     });
 
-    it('uses a custom interceptor from withAuth instead of signing in', async () => {
-        const client = build()
-            .withAuth((config) => {
-                config.headers.set('Authorization', 'custom');
-                return config;
-            })
-            .build(ApiClient);
-
-        await client.get(`${api.url}/one`);
-
-        expect(paths()).toEqual(['/one']);
-        expect(api.requests[0].headers.authorization).toBe('custom');
-    });
-
-    it('sends requests unauthenticated with withAuth(false)', async () => {
-        const client = build().withAuth(false).build(ApiClient);
-
-        await client.get(`${api.url}/one`);
-
-        expect(paths()).toEqual(['/one']);
-        expect(api.requests[0].headers.authorization).toBeUndefined();
-    });
-
     it('runs request interceptors after authentication', async () => {
         const seen: unknown[] = [];
         const client = build()
