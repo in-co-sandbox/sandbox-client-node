@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import { ApiUserCredentials } from '../../auth/credential/ApiUserCredentials';
 import { Endpoint } from '../../auth/endpoints/Endpoint';
 import { ApiUserSession } from '../../auth/session/ApiUserSession';
+import { ApiResponse } from '../../beans/ApiResponse';
 import { SandboxException } from '../../exception/SandboxException';
 import { EndpointBuilder } from '../../utils/EndpointBuilder';
 
@@ -89,8 +90,11 @@ export class AuthRequestInterceptor {
     private async checkAuthorization(token: string): Promise<string> {
         const { iss: issuer, exp } = jwtDecode(token);
         if (!issuer) throw new SandboxException('Invalid token issuer: undefined', 401);
-        const issuerHost = new URL(issuer.startsWith('http') ? issuer : `https://${issuer}`).host;
-        if (!issuerHost.includes('sandbox.co.in')) throw new SandboxException(`Invalid token issuer: ${issuer}`, 401);
+        const issuerUrl = new URL(issuer.startsWith('http') ? issuer : `https://${issuer}`);
+        if (!AuthRequestInterceptor.isSandboxHost(issuerUrl.hostname)) {
+            throw new SandboxException(`Invalid token issuer: ${issuer}`, 401);
+        }
+        const issuerHost = issuerUrl.host;
 
         const expired = exp !== undefined && exp < AuthRequestInterceptor.now();
         if (!expired) return token;
@@ -110,9 +114,19 @@ export class AuthRequestInterceptor {
                     'x-api-secret': this.credentials.getApiSecret(),
                 },
             });
-            const accessToken: string | undefined = response.data?.data?.access_token;
-            if (!accessToken) throw new SandboxException('Sign-in response has no access token', 500);
-            return new ApiUserSession(this.credentials.getApiKey()).withAccessToken(accessToken) as ApiUserSession;
+            // The API can answer HTTP 200 with an error code in the body; report its code and message.
+            const body = new ApiResponse(response.data ?? {});
+            const accessToken: string | undefined = body.getData()?.access_token;
+            if (body.getCode() === 200 && accessToken) {
+                return new ApiUserSession(this.credentials.getApiKey()).withAccessToken(accessToken) as ApiUserSession;
+            }
+            if (body.getCode() === 401) throw new SandboxException('Invalid api key or secret', 401);
+            throw new SandboxException(
+                body.getMessage() || 'Sign-in response has no access token',
+                body.getCode() || 500,
+                body.getTransactionId(),
+                response.data?.timestamp,
+            );
         } catch (error) {
             if (error instanceof SandboxException) throw error;
             if (error instanceof AxiosError && error.response?.status === 401) {
@@ -132,6 +146,11 @@ export class AuthRequestInterceptor {
 
     private authenticateUrl(): string {
         return EndpointBuilder.build(this.baseUrl(), Endpoint.AUTHENTICATE);
+    }
+
+    /** True for `sandbox.co.in` and its subdomains; not for hosts that merely contain the name. */
+    private static isSandboxHost(hostname: string): boolean {
+        return hostname === 'sandbox.co.in' || hostname.endsWith('.sandbox.co.in');
     }
 
     private static isExpired(token: string): boolean {

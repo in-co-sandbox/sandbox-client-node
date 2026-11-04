@@ -3,12 +3,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ApiUserCredentials, AuthRequestInterceptor } from '../src';
 import { anHourAgo, inOneHour, token } from './server';
 
-/** An interceptor whose sign-in call is replaced, so no request leaves the test. */
-function interceptorWithSignIn(accessToken: string) {
+/** An interceptor whose sign-in call answers with `body`, so no request leaves the test. */
+function interceptorWithSignInBody(body: Record<string, unknown>) {
     const interceptor = new AuthRequestInterceptor(new ApiUserCredentials('key_live_123', 'secret'));
-    const post = vi.fn(async (url: string) => ({ url, data: { code: 200, data: { access_token: accessToken } } }));
+    const post = vi.fn(async (url: string) => ({ url, data: body }));
     (interceptor as unknown as { authClient: { post: typeof post } }).authClient.post = post;
     return { interceptor, post };
+}
+
+/** An interceptor whose sign-in call succeeds with `accessToken`. */
+function interceptorWithSignIn(accessToken: string) {
+    return interceptorWithSignInBody({ code: 200, data: { access_token: accessToken } });
 }
 
 const request = (authorization?: string): InternalAxiosRequestConfig => {
@@ -40,6 +45,46 @@ describe('AuthRequestInterceptor', () => {
         await interceptor.intercept(request());
 
         expect(post.mock.calls[0][0]).toBe('https://api.sandbox.co.in/authenticate');
+    });
+
+    it('reports the error code and message the API returns with HTTP 200', async () => {
+        const { interceptor } = interceptorWithSignInBody({
+            code: 403,
+            message: 'API key is suspended',
+            transaction_id: 'txn-1',
+            timestamp: 1_700_000_000_000,
+        });
+
+        await expect(interceptor.intercept(request())).rejects.toMatchObject({
+            code: 403,
+            message: 'API key is suspended',
+            transactionId: 'txn-1',
+        });
+    });
+
+    it('reports a 401 in the response body as invalid credentials', async () => {
+        const { interceptor } = interceptorWithSignInBody({ code: 401, message: 'Unauthorized' });
+
+        await expect(interceptor.intercept(request())).rejects.toMatchObject({
+            code: 401,
+            message: 'Invalid api key or secret',
+        });
+    });
+
+    it('accepts sandbox.co.in issuers and rejects hosts that only contain the name', async () => {
+        const { interceptor } = interceptorWithSignIn('unused');
+        const owner = (iss: string) => request(token({ iss, exp: inOneHour() }));
+
+        await expect(interceptor.intercept(owner('accounts.sandbox.co.in'))).resolves.toBeDefined();
+        await expect(interceptor.intercept(owner('https://sandbox.co.in'))).resolves.toBeDefined();
+        await Promise.all(
+            ['sandbox.co.in.example.com', 'notsandbox.co.in', 'example.com/sandbox.co.in'].map((iss) =>
+                expect(interceptor.intercept(owner(iss))).rejects.toMatchObject({
+                    code: 401,
+                    message: `Invalid token issuer: ${iss}`,
+                }),
+            ),
+        );
     });
 
     it('leaves the sign-in request itself alone', async () => {
