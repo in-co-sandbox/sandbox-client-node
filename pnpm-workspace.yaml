@@ -1,0 +1,42 @@
+packages:
+    - tooling/*
+    - packages/libs/*
+    - packages/clients/*
+
+catalog:
+    '@types/mustache': '4.2.6'
+    '@types/node': '22.20.5'
+    '@org-quicko/core': '^2.0.7'
+    '@rollup/plugin-commonjs': '29.0.3'
+    '@rollup/plugin-json': '6.1.0'
+    '@rollup/plugin-node-resolve': '16.0.3'
+    '@rollup/plugin-terser': '1.0.2'
+    '@typescript/typescript6': '6.0.2'
+    axios: '^1.20.0'
+    change-case: '^5.4.4'
+    form-data: '^4.0.6'
+    json-schema-faker: '^0.5.9'
+    json-schema-to-zod: '^2.7.0'
+    jwt-decode: '^4.0.0'
+    mustache: '^4.2.0'
+    openapi-types: '12.1.3'
+    oxfmt: '0.74.0'
+    oxlint: '1.89.0'
+    oxlint-tsgolint: '7.0.2005'
+    rollup: '4.65.1'
+    rollup-plugin-dts: '6.5.1'
+    rollup-plugin-sourcemaps: '0.6.3'
+    typescript: '7.1.0-beta'
+    vite: '8.3.5'
+    vitest: '5.0.5'
+    zod: '^4.3.6'
+
+strictDepBuilds: true
+
+allowBuilds:
+    esbuild: true
+    unrs-resolver: true
+
+# rollup-plugin-sourcemaps 0.6 depends on @rollup/pluginutils 3, whose rollup peer stops at 2.
+overrides:
+    'rollup-plugin-sourcemaps>@rollup/pluginutils': '5.5.1'

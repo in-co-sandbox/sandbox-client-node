@@ -1,0 +1,61 @@
+{
+    "name": "@in-co-sandbox/rollup-config",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "description": "Shared Rollup configurations for Sandbox libraries.",
+    "license": "ISC",
+    "engines": {
+        "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+    },
+    "files": [
+        "src",
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\" && tsc -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "test": "vitest run"
+    },
+    "exports": {
+        "./lambda": {
+            "types": "./dist/lambda.d.ts",
+            "import": "./src/lambda.js"
+        },
+        "./library": {
+            "types": "./dist/library.d.ts",
+            "import": "./src/library.js"
+        }
+    },
+    "devDependencies": {
+        "@in-co-sandbox/typescript-config": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "oxfmt": "catalog:",
+        "rollup": "catalog:",
+        "@in-co-sandbox/vitest-config": "workspace:*",
+        "vitest": "catalog:",
+        "vite": "catalog:"
+    },
+    "peerDependencies": {
+        "rollup": "^4.65.1"
+    },
+    "dependencies": {
+        "@rollup/plugin-commonjs": "catalog:",
+        "@rollup/plugin-json": "catalog:",
+        "@rollup/plugin-node-resolve": "catalog:",
+        "@rollup/plugin-terser": "catalog:",
+        "@typescript/typescript6": "catalog:",
+        "rollup-plugin-dts": "catalog:",
+        "rollup-plugin-sourcemaps": "catalog:"
+    },
+    "bin": {
+        "sandbox-rollup": "./src/bin.js",
+        "sandbox-clean": "./src/clean.mjs",
+        "sandbox-copy-environment": "./src/copyEnvironment.mjs"
+    }
+}

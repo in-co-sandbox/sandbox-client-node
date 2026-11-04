@@ -1,46 +1,97 @@
 {
-    "$schema": "https://turbo.build/schema.json",
+    "$schema": "https://turborepo.dev/schema.json",
+    "globalDependencies": ["tooling/typescript/*.json", "oxlint.config.ts", "oxfmt.config.ts"],
     "tasks": {
         "build": {
-            "dependsOn": [
-                "^build"
+            "dependsOn": ["^build"],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!node_modules/**",
+                "!generated/**",
+                "!.codegen/**",
+                "!.turbo/**",
+                "!dist/**",
+                "!.build/**",
+                "!.docker/**",
+                "!.cache/**",
+                "!coverage/**",
+                "!tests/**",
+                "!.agents/**",
+                "!.claude/**",
+                "!cicd/**",
+                "!**/*.md",
+                "!sonar-project.properties",
+                "!*.zip",
+                "!lambda_archive.version"
             ],
-            "outputs": [
-                "dist/**"
-            ]
+            "outputs": ["dist/**", ".build/**", "generated/**", ".codegen/**"]
         },
-        "clean": {
-            "cache": false
+        "typecheck": {
+            "dependsOn": ["build"],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!node_modules/**",
+                "!generated/**",
+                "!.codegen/**",
+                "!.turbo/**",
+                "!dist/**",
+                "!.build/**",
+                "!.docker/**",
+                "!.cache/**",
+                "!coverage/**",
+                "!.agents/**",
+                "!.claude/**",
+                "!cicd/**",
+                "!**/*.md",
+                "!sonar-project.properties",
+                "!*.zip",
+                "!lambda_archive.version"
+            ]
         },
         "lint": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": []
-        },
-        "lint:check": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": []
-        },
-        "format": {
-            "outputs": []
-        },
-        "format:check": {
-            "outputs": []
-        },
-        "test": {
-            "dependsOn": [
-                "build"
-            ],
-            "outputs": [
-                "coverage/**"
+            "dependsOn": ["build"],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!node_modules/**",
+                "!generated/**",
+                "!.codegen/**",
+                "!.turbo/**",
+                "!dist/**",
+                "!.build/**",
+                "!.docker/**",
+                "!.cache/**",
+                "!coverage/**",
+                "!.agents/**",
+                "!.claude/**",
+                "!cicd/**",
+                "!**/*.md",
+                "!sonar-project.properties",
+                "!*.zip",
+                "!lambda_archive.version"
             ]
         },
-        "dev": {
-            "cache": false,
-            "persistent": true
+        "test": {
+            "dependsOn": ["build"],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "!node_modules/**",
+                "!generated/**",
+                "!.codegen/**",
+                "!.turbo/**",
+                "!dist/**",
+                "!.build/**",
+                "!.docker/**",
+                "!.cache/**",
+                "!coverage/**",
+                "!.agents/**",
+                "!.claude/**",
+                "!cicd/**",
+                "!**/*.md",
+                "!sonar-project.properties",
+                "!*.zip",
+                "!lambda_archive.version"
+            ],
+            "cache": false
         }
     }
 }

@@ -1,8 +1,8 @@
 import { pascalCase, camelCase } from "change-case";
-import { jsonSchemaToZod } from "json-schema-to-zod";
-import { CodegenOperation, CodegenOperationGroup, CodegenParameter } from "../models/CodegenOperation";
-import { OpenAPIV3 } from "openapi-types";
 import { JSONSchemaFaker } from "json-schema-faker";
+import { jsonSchemaToZod } from "json-schema-to-zod";
+import { OpenAPIV3 } from "openapi-types";
+import { CodegenOperation, CodegenOperationGroup, CodegenParameter } from "../models/CodegenOperation";
 
 export interface FunctionParam {
 	name: string;

@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "lib": ["ESNext"],
+        "types": ["node"],
+        "strict": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": false,
+        "skipLibCheck": true,
+        "noEmit": true
+    },
+    "include": ["${configDir}/src/**/*", "${configDir}/tests/**/*", "${configDir}/*.ts", "${configDir}/generated/**/*"],
+    "exclude": ["${configDir}/node_modules", "${configDir}/dist", "${configDir}/.build"]
+}

@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-explicit-any -- an entity holds JSON of any shape */
 /**
  * Base class for all entities.
  */

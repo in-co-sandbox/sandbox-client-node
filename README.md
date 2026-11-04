@@ -1,127 +1,98 @@
 # Sandbox Client Node
 
-The official repository of SDKs to communicate with Sandbox APIs. This is a monorepo containing multiple TypeScript packages for interacting with various Sandbox services including KYC, OCR, and other API clients.
+The official Node.js libraries for the [Sandbox API](https://sandbox.co.in).
 
-## 📦 Packages
+## Packages
 
-This monorepo contains the following packages:
+| Package | Version | What it does |
+|---|---|---|
+| [`@in-co-sandbox/api-endpoints`](packages/libs/api-endpoints) | 2.0.0 | The API's base URLs, picked per API key |
+| [`@in-co-sandbox/api-client-core`](packages/libs/api-client-core) | 2.0.0 | Authentication, sessions and the HTTP client every Sandbox client builds on |
+| [`@in-co-sandbox/kyc-api-client`](packages/clients/kyc) | 1.0.0 | Clients for Aadhaar, bank, PAN, MCA, DigiLocker and EntityLocker |
+| [`@in-co-sandbox/api-client-generator`](packages/libs/api-client-generator) | 1.0.0 | Generates clients like the KYC one from an OpenAPI document |
 
-- **`@in-co-sandbox/api-client-core`** - Core functionality for API clients including authentication, session management, and base client implementations
-- **`@in-co-sandbox/api-endpoints`** - Endpoint definitions and builders
-- **`@in-co-sandbox/kyc-api-client`** - KYC (Know Your Customer) SDK with support for:
-  - Aadhaar verification
-  - Bank account verification
-  - PAN verification
-  - MCA (Ministry of Corporate Affairs) verification
-  - Digilocker and EntityLocker integrations
+All packages are ESM-only and need Node.js 22 or later.
 
-## 🏗️ Monorepo Structure
-
-This project uses [Turborepo](https://turbo.build/repo) to manage the monorepo, which handles building packages in the correct order and caches builds for faster execution.
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** >= 18.0.0
-- **npm** >= 11.6.2 (the project uses npm as the package manager)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd sandbox-client-node/main
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-   
-   This will install dependencies for all packages in the monorepo using npm workspaces.
-
-### Building the Project
-
-Build all packages:
+## Usage
 
 ```bash
-npm run build
+npm install @in-co-sandbox/api-client-core
 ```
 
-### Development Workflow
+```ts
+import { ApiClient, ApiClientBuilder, ApiUserCredentials } from '@in-co-sandbox/api-client-core';
+import { Endpoint } from '@in-co-sandbox/api-endpoints';
 
-#### Run tests across all packages:
-```bash
-npm test
+const credentials = new ApiUserCredentials(process.env.SANDBOX_API_KEY!, process.env.SANDBOX_API_SECRET!);
+const client = new ApiClientBuilder().withCredentials(credentials).build(ApiClient);
+
+// Signs in on the first request, then reuses the access token until it expires.
+const response = await client.get(`${Endpoint.get(credentials.getApiKey())}/some/path`);
 ```
 
-#### Lint all packages:
-```bash
-npm run lint          # Auto-fix issues
-npm run lint:check    # Check without fixing
-```
+### Which host is called
 
-#### Format code:
-```bash
-npm run format        # Format all files
-npm run format:check  # Check formatting without fixing
-```
+`Endpoint.get(apiKey)` picks the host: `https://test-api.sandbox.co.in` for `key_test_…` keys, and `https://api.sandbox.co.in` for any other key. Clients sign in at and call that host. The libraries read no environment variables.
 
-#### Clean build artifacts:
-```bash
-npm run clean
-```
+### Authentication
 
-### Working with Individual Packages
+Every client signs in at its host with its API key and secret on the first request, caches the access token, and signs in again once it expires. To send a token you already have, such as an end user's, set the `Authorization` header on the call.
 
-You can also work with individual packages by navigating to their directory:
+`withRequestInterceptors([...])` adds interceptors that run after authentication.
+
+## Development
+
+The repository is a [pnpm](https://pnpm.io) workspace built with [Turborepo](https://turborepo.com). Shared TypeScript, Rollup, Vitest, Oxlint and Oxfmt settings live in `tooling/`.
 
 ```bash
-cd packages/kyc
-npm test              # Run tests for KYC package only
-npm run build         # Build KYC package (and its dependencies)
+pnpm install
+pnpm build    # every package
+pnpm verify   # package boundaries, formatting, typecheck, lint and tests
+pnpm format   # format everything
 ```
 
-## 📚 Package Details
+To work on one package, filter by its name:
 
-### API Client Core
+```bash
+pnpm exec turbo run test --filter=@in-co-sandbox/api-client-core
+```
 
-Provides authentication, base client implementations, and error handling.
+The KYC client's tests call the live API. Run them on demand with API keys set:
 
-### KYC API Client
+```bash
+pnpm --filter @in-co-sandbox/kyc-api-client test:integration
+```
 
-Provides clients for various KYC services including Aadhaar, Bank, PAN, MCA verification, and Digilocker/EntityLocker integrations.
+## Releasing
 
-## 🔧 Configuration
+To release a package, bump its `version` and merge to `main`. The **Publish to npm** workflow verifies the workspace and runs `pnpm -r publish` with provenance:
 
-Each package uses TypeScript 5.9+ with Rollup for bundling and ESBuild for compilation.
+- packages marked `"private": true` (everything in `tooling/`) are never published
+- a package whose version is already on npm is skipped, so only bumped packages go out
 
-## 📝 Scripts Reference
+It needs an `NPM_TOKEN` secret that can publish to the `@in-co-sandbox` scope.
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Build all packages using Turborepo |
-| `npm run clean` | Remove all build artifacts |
-| `npm test` | Run tests across all packages |
-| `npm run lint` | Lint and auto-fix all packages |
-| `npm run lint:check` | Check linting without fixing |
-| `npm run format` | Format all code with Prettier |
-| `npm run format:check` | Check code formatting |
+### Internal builds
 
-## 🤝 Contributing
+Sandbox's own services use builds of `api-endpoints` and `api-client-core` pinned to an internal API host, versioned like `2.0.0-dev` and `2.0.0-uat`. They go to the internal registry, by hand, never to npm:
 
-1. Make your changes in the appropriate package
-2. Run `npm run format` to format your code
-3. Run `npm run lint:check` to check for linting issues
-4. Run `npm test` to ensure all tests pass
-5. Run `npm run build` to verify the build succeeds
+1. Set `HOST` in `packages/libs/api-endpoints/src/endpoint/host.ts` to the internal host.
+2. Set `version` to `2.0.0-dev` in both packages' `package.json`.
+3. Build and publish, then discard the edits:
 
-## 📄 License
+```bash
+pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core run build
+pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core publish --registry <internal registry> --tag dev --no-git-checks
+git checkout -- packages/libs
+```
+
+`api-client-core` depends on its exact `api-endpoints` version, so `api-client-core@2.0.0-dev` always calls the dev host. To call two environments from one process, install both under aliases:
+
+```json
+"@in-co-sandbox/api-client-core": "2.0.0",
+"@in-co-sandbox/api-client-core-dev": "npm:@in-co-sandbox/api-client-core@2.0.0-dev"
+```
+
+## License
 
 ISC
-
-## 🔗 Links
-
-- [Homepage](https://sandbox.co.in)
-- [Turborepo Documentation](https://turbo.build/repo/docs)

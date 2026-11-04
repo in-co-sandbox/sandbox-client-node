@@ -1,14 +1,13 @@
+import { pascalCase } from "change-case";
 import * as fs from "fs";
-import * as path from "path";
 import Mustache from "mustache";
 import { OpenAPIV3 } from "openapi-types";
-import { pascalCase } from "change-case";
-
-import { GeneratorConfig } from "../config/GeneratorConfig";
-import { OperationParser } from "../parser/OperationParser";
-import { CodegenOperationGroup } from "../models/CodegenOperation";
-import { TemplateLoader } from "./templates/TemplateLoader";
+import * as path from "path";
 import { OperationTransformer } from "../codegen/OperationTransformer";
+import { GeneratorConfig } from "../config/GeneratorConfig";
+import { CodegenOperationGroup } from "../models/CodegenOperation";
+import { OperationParser } from "../parser/OperationParser";
+import { TemplateLoader } from "./templates/TemplateLoader";
 
 /**
  * Client Generator for in-co-sandbox SDK
@@ -161,7 +160,7 @@ export class ClientGenerator {
 		console.log(`  Generated: index.ts`);
 	}
 
-	private generateTestFile(group: CodegenOperationGroup, clientDir: string): void {
+	private generateTestFile(group: CodegenOperationGroup, _clientDir: string): void {
 		// Create tag path from tags array (e.g., "kyc/pan")
 		const tagPath = group.tags.join("/");
 		const testData = this.operationTransformer.buildTestData(group, tagPath);

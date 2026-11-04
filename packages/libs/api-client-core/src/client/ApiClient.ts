@@ -1,38 +1,33 @@
-import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
-import axios, {
+import {
     AxiosError,
-    AxiosHeaders,
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosResponse,
-    InternalAxiosRequestConfig,
+    create as createAxios,
+    type AxiosInstance,
+    type AxiosRequestConfig,
+    type AxiosResponse,
+    type InternalAxiosRequestConfig,
 } from 'axios';
-import { jwtDecode } from 'jwt-decode';
-
 import { ApiUserCredentials } from '../auth/credential/ApiUserCredentials';
-import { Endpoint } from '../auth/endpoints/Endpoint';
-import { ApiUserSession } from '../auth/session/ApiUserSession';
 import { ApiResponse } from '../beans/ApiResponse';
 import { Entity } from '../beans/Entity';
 import { SandboxException } from '../exception/SandboxException';
 import { EndpointBuilder } from '../utils/EndpointBuilder';
+import { AuthRequestInterceptor } from './interceptor/AuthRequestInterceptor';
+import type { RequestInterceptor } from './interceptor/RequestInterceptor';
 
 /**
  * A client for interacting with the API.
  *
  * This class provides methods for making HTTP requests (GET, POST, DELETE) to the API endpoints.
- * It automatically manages authentication tokens via a request interceptor.
+ * It authenticates every request with an {@link AuthRequestInterceptor}.
  */
 export class ApiClient {
-    /** The user agent string sent with every request. */
-    protected static readonly USER_AGENT: string = 'in-co.sandbox.api-client-core/1.0.0 Node/14';
+    /** The user agent sent with every request. */
+    protected static readonly USER_AGENT: string = AuthRequestInterceptor.USER_AGENT;
 
-    /** The API version string sent with every request. */
-    protected static readonly API_VERSION: string = '1.0.0';
+    /** The API version sent with every request. */
+    protected static readonly API_VERSION: string = AuthRequestInterceptor.API_VERSION;
 
     protected credentials: ApiUserCredentials;
-
-    protected session: ApiUserSession | null = null;
 
     protected client: AxiosInstance;
 
@@ -41,29 +36,22 @@ export class ApiClient {
      *
      * @param credentials - The API user credentials.
      * @param timeout - The connection timeout in seconds.
-     * @param enableDebugging - Whether to enable detailed logging.
-     *
-     * @throws SandboxException if an error occurs during initialization.
+     * @param enableDebugging - Whether to log every request and response.
+     * @param requestInterceptors - Interceptors that run after authentication, on every request.
      */
     constructor(
         credentials: ApiUserCredentials,
         timeout: number,
         enableDebugging: boolean,
-        requestInterceptors: Array<
-            (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>
-        >,
+        requestInterceptors: RequestInterceptor[] = [],
     ) {
         this.credentials = credentials;
-        this.client = axios.create({ timeout: timeout * 1000 });
+        this.client = createAxios({ timeout: timeout * 1000 });
 
-        if (requestInterceptors != null) {
-            requestInterceptors.forEach((interceptor) => {
-                this.client.interceptors.request.use(interceptor);
-            });
-        }
-        // Setup interceptors
+        // Axios runs request interceptors last-registered first: logging, then auth, then the caller's.
+        requestInterceptors?.forEach((interceptor) => this.client.interceptors.request.use(interceptor));
 
-        this.client.interceptors.request.use(this.requestInterceptor.bind(this));
+        this.client.interceptors.request.use(new AuthRequestInterceptor(credentials, timeout).intercept);
 
         if (enableDebugging) {
             this.client.interceptors.request.use(this.requestLoggingInterceptor.bind(this));
@@ -71,98 +59,10 @@ export class ApiClient {
         }
     }
 
-    /**
-     * Sets up the request interceptor to handle authentication and token refresh.
-     */
-
-    private async requestInterceptor(axiosConfig: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> {
-        const config = axiosConfig;
-
-        // For authentication requests , don't add Authorization header
-        if (
-            config.url === EndpointBuilder.build(BaseEndpoint.get(this.credentials.getApiKey()), Endpoint.AUTHENTICATE)
-        ) {
-            return config;
-        }
-
-        // For all the other requests, ensure that the Authorization header is set
-
-        if (!config.headers) {
-            config.headers = new AxiosHeaders();
-        }
-
-        try {
-            const currentTime = Math.floor(Date.now() / 1000);
-
-            if (!config.headers.Authorization) {
-                if (this.session) {
-                    const accessToken = this.session.getAccessToken()!;
-                    const decodedSessionToken = jwtDecode(accessToken);
-
-                    // Check if the token in the session is expired
-                    if (decodedSessionToken.exp && decodedSessionToken.exp < currentTime) {
-                        this.session = await this.authenticate();
-                        config.headers.Authorization = this.session.getAccessToken();
-                    } else {
-                        config.headers.Authorization = accessToken;
-                    }
-                } else {
-                    this.session = await this.authenticate();
-                    config.headers.Authorization = this.session.getAccessToken();
-                }
-            } else {
-                const token = config.headers.Authorization as string;
-                const decoded = jwtDecode(token);
-                // Check if issuer is sandbox
-                const issuer = decoded.iss!;
-                const issuerUri = new URL(issuer.startsWith('http') ? issuer : `https://${issuer}`);
-
-                if (issuerUri.host.includes('sandbox.co.in')) {
-                    // api user access token
-                    if (issuerUri.host === 'api.sandbox.co.in') {
-                        if (decoded.exp && decoded.exp < currentTime) {
-                            if (this.session) {
-                                const accessToken = this.session.getAccessToken()!;
-                                const decodedSessionToken = jwtDecode(accessToken);
-                                // Check if the token in the session is expired
-                                if (decodedSessionToken.exp && decodedSessionToken.exp < currentTime) {
-                                    this.session = await this.authenticate();
-                                    config.headers.Authorization = this.session.getAccessToken();
-                                } else {
-                                    config.headers.Authorization = accessToken;
-                                }
-                            } else {
-                                this.session = await this.authenticate();
-                                config.headers.Authorization = this.session.getAccessToken();
-                            }
-                        }
-                    }
-                    // Check resource owner token expiry
-                    if (decoded.exp && decoded.exp < currentTime) {
-                        throw new SandboxException(`Token has expired: ${decoded.exp}`, 401);
-                    }
-                } else {
-                    throw new SandboxException(`Invalid token issuer: ${decoded.iss}`, 401);
-                }
-            }
-        } catch (error) {
-            if (error instanceof SandboxException) {
-                throw error;
-            }
-            throw new SandboxException('Internal Server Error', 500);
-        }
-
-        // Add common headers
-        config.headers['User-Agent'] = ApiClient.USER_AGENT;
-        config.headers['x-api-version'] = ApiClient.API_VERSION;
-        config.headers['x-api-key'] = this.credentials.getApiKey();
-
-        return config;
-    }
-
     private async requestLoggingInterceptor(
         axiosConfig: InternalAxiosRequestConfig,
     ): Promise<InternalAxiosRequestConfig> {
+        // oxlint-disable-next-line no-console -- logging is what withLogging(true) asks for
         console.info('Request:', {
             url: axiosConfig.url,
             method: axiosConfig.method,
@@ -173,53 +73,13 @@ export class ApiClient {
     }
 
     private async responseLoggingInterceptor(response: AxiosResponse): Promise<AxiosResponse> {
+        // oxlint-disable-next-line no-console -- logging is what withLogging(true) asks for
         console.info('Response:', {
             url: response.config.url,
             status: response.status,
             data: response.data,
         });
         return response;
-    }
-
-    /**
-     * Authenticates using API key and secret.
-     *
-     * @returns The API user session
-     * @throws SandboxException if authentication fails
-     */
-    private async authenticate(): Promise<ApiUserSession> {
-        try {
-            const headers = {
-                'x-api-key': this.credentials.getApiKey(),
-                'x-api-secret': this.credentials.getApiSecret(),
-            };
-
-            const response = await this.postForGet(
-                EndpointBuilder.build(BaseEndpoint.get(this.credentials.getApiKey()), Endpoint.AUTHENTICATE),
-                new Entity({}),
-                headers,
-            );
-
-            if (response.getCode() === 200) {
-                const responseData = response.getData();
-
-                const session = new ApiUserSession(this.credentials.getApiKey()).withAccessToken(
-                    responseData.access_token,
-                );
-
-                return session;
-            }
-            if (response.getCode() === 401) {
-                throw new SandboxException('Invalid api key or secret', 401);
-            }
-
-            throw new SandboxException(response.getMessage(), response.getCode());
-        } catch (e) {
-            if (e instanceof SandboxException) {
-                throw e;
-            }
-            throw new SandboxException('Internal Server Error', 500);
-        }
     }
 
     // ============================================================================
@@ -315,14 +175,14 @@ export class ApiClient {
                 },
             };
             await this.client.post(finalUrl, requestBody, config);
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (error instanceof SandboxException) {
                 throw error;
             }
             if (error instanceof AxiosError) {
                 throw new SandboxException(error.response?.data.message || error.message, error.status || 500);
             }
-            throw new SandboxException(error.message);
+            throw new SandboxException(error instanceof Error ? error.message : String(error));
         }
     }
 

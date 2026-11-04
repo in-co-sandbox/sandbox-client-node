@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-explicit-any -- response data is JSON of any shape */
 import { Entity } from './Entity';
 
 /**

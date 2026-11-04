@@ -1,0 +1,22 @@
+{
+    "extends": "./base.json",
+    "compilerOptions": {
+        "rootDir": "${configDir}",
+        "outDir": "${configDir}/.build",
+        "noEmit": false,
+        "noEmitOnError": true,
+        "sourceMap": true,
+        "inlineSources": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "include": ["${configDir}/index.ts", "${configDir}/src/**/*", "${configDir}/generated/**/*"],
+    "exclude": [
+        "${configDir}/node_modules",
+        "${configDir}/dist",
+        "${configDir}/.build",
+        "${configDir}/tests",
+        "${configDir}/**/*.test.*",
+        "${configDir}/**/*.spec.*"
+    ]
+}

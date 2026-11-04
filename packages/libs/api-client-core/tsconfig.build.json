@@ -1,0 +1,3 @@
+{
+    "extends": ["./tsconfig.json", "@in-co-sandbox/typescript-config/build.json"]
+}

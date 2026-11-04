@@ -1,15 +1,15 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { EntityLockerSDKClient } from '../src/kyc/entitylocker-sdk/client/EntityLockerSDKClient';
 import { CreateSessionRequest } from '../src/kyc/entitylocker-sdk/schemas/request/CreateSessionRequest';
 
 describe('EntityLockerSDKClient', () => {
     // Test constants
-    const ENTITY = 'in.co.sandbox.kyc.digilocker.sdk.session.request';
-    const FLOW = 'signup';
-    const DOC_TYPES = ['aadhaar', 'aadhaar'];
+    const ENTITY = 'in.co.sandbox.kyc.entitylocker.sdk.session.request' as const;
+    const FLOW = 'signup' as const;
+    const DOC_TYPES = ['company_master_details', 'gstn_details'] as ('company_master_details' | 'gstn_details')[];
     const SESSIONID = 'non Lorem';
-    const DOCTYPE = 'esse irure sit consectetur';
+    const DOCTYPE = 'gstn_details' as const;
 
     // API Credentials - Replace with actual values
     const API_KEY = '';

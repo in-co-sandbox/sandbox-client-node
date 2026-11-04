@@ -1,0 +1,9 @@
+{
+    "extends": "@in-co-sandbox/typescript-config/base.json",
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true
+    },
+    "include": ["src/index.js"],
+    "exclude": ["node_modules", "dist"]
+}

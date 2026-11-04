@@ -1,7 +1,10 @@
 // Export client classes
 export { ApiClient } from './client/ApiClient';
 export { ApiClientBuilder } from './client/ApiClientBuilder';
+export type { ApiClientConstructor } from './client/ApiClientBuilder';
 export { OcrApiClient } from './client/OcrApiClient';
+export { AuthRequestInterceptor } from './client/interceptor/AuthRequestInterceptor';
+export type { RequestInterceptor } from './client/interceptor/RequestInterceptor';
 
 // Export auth classes
 export { ApiUserCredentials } from './auth/credential/ApiUserCredentials';

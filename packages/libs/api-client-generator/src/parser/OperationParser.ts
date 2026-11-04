@@ -1,5 +1,5 @@
-import { OpenAPIV3 } from "openapi-types";
 import { camelCase, pascalCase } from "change-case";
+import { OpenAPIV3 } from "openapi-types";
 import { CodegenOperation, CodegenOperationGroup, CodegenParameter, CodegenRequestBody, CodegenResponse, ParameterConstraints, SchemaIR } from "../models/CodegenOperation";
 import { SchemaParser } from "./SchemaParser";
 

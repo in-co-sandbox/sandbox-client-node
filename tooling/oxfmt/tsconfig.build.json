@@ -1,0 +1,9 @@
+{
+    "extends": ["./tsconfig.json", "@in-co-sandbox/typescript-config/build.json"],
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist",
+        "emitDeclarationOnly": true
+    },
+    "include": ["src/index.js"]
+}

@@ -38,14 +38,11 @@ export class ResourceOwnerSession extends Session {
     }
 
     /**
-     * Sets the refresh token.
+     * Does nothing: resource owner sessions have no refresh token. Callers may still pass one, as for any {@link Session}.
      *
-     * @param _refreshToken - The refresh token
-     * @returns The session
+     * @returns This session, unchanged.
      */
-
-    public withRefreshToken(refreshToken: string): Session {
-        // Resource owner session doesn't use refresh tokens
+    public withRefreshToken(): Session {
         return this;
     }
 }
