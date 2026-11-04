@@ -42,15 +42,20 @@ export class AuthRequestInterceptor {
 
     private session: ApiUserSession | null = null;
 
+    /** The API host to sign in at, without a trailing slash. */
+    private readonly baseUrl: string;
+
     /** Sends only the sign-in request, so signing in never runs this interceptor again. */
     private readonly authClient: AxiosInstance;
 
     /**
      * @param credentials - The API key and secret to sign in with.
      * @param timeout - The sign-in request timeout, in seconds.
+     * @param host - The API host to sign in at. Omitted: `Endpoint.get(apiKey)`, which honours `SANDBOX_API_HOST`.
      */
-    constructor(credentials: ApiUserCredentials, timeout: number = 30) {
+    constructor(credentials: ApiUserCredentials, timeout: number = 30, host?: string) {
         this.credentials = credentials;
+        this.baseUrl = (host ?? BaseEndpoint.get(credentials.getApiKey())).replace(/\/+$/, '');
         this.authClient = createAxios({ timeout: timeout * 1000 });
     }
 
@@ -61,10 +66,7 @@ export class AuthRequestInterceptor {
      */
     public intercept = async (axiosConfig: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
         const config = axiosConfig;
-        const authenticateUrl = EndpointBuilder.build(
-            BaseEndpoint.get(this.credentials.getApiKey()),
-            Endpoint.AUTHENTICATE,
-        );
+        const authenticateUrl = EndpointBuilder.build(this.baseUrl, Endpoint.AUTHENTICATE);
         if (config.url === authenticateUrl) return config;
         if (!config.headers) config.headers = new AxiosHeaders();
 
@@ -115,17 +117,14 @@ export class AuthRequestInterceptor {
 
         const expired = exp !== undefined && exp * 1000 < DateUtil.nowInMillis();
         if (!expired) return token;
-        if (issuerHost === new URL(BaseEndpoint.get(this.credentials.getApiKey())).host) return this.accessToken();
+        if (issuerHost === new URL(this.baseUrl).host) return this.accessToken();
         throw new SandboxException(`Token has expired: ${exp}`, 401);
     }
 
     /** Signs in with the API key and secret. */
     private async authenticate(): Promise<ApiUserSession> {
         try {
-            const authenticateUrl = EndpointBuilder.build(
-                BaseEndpoint.get(this.credentials.getApiKey()),
-                Endpoint.AUTHENTICATE,
-            );
+            const authenticateUrl = EndpointBuilder.build(this.baseUrl, Endpoint.AUTHENTICATE);
             const response = await this.authClient.post(authenticateUrl, '{}', {
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',

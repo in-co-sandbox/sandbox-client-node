@@ -21,21 +21,30 @@ npm install @in-co-sandbox/api-client-core
 
 ```ts
 import { ApiClient, ApiClientBuilder, ApiUserCredentials } from '@in-co-sandbox/api-client-core';
-import { Endpoint } from '@in-co-sandbox/api-endpoints';
 
 const credentials = new ApiUserCredentials(process.env.SANDBOX_API_KEY!, process.env.SANDBOX_API_SECRET!);
 const client = new ApiClientBuilder().withCredentials(credentials).build(ApiClient);
 
 // Signs in on the first request, then reuses the access token until it expires.
-const response = await client.get(`${Endpoint.get(credentials.getApiKey())}/some/path`);
+const response = await client.get(`${client.getBaseUrl()}/some/path`);
 ```
 
 ### Which host is called
 
-`Endpoint.get(apiKey)` returns:
+Each client picks its host when it's built, and signs in at and calls that host:
 
-1. `SANDBOX_API_HOST`, when that environment variable is set, for every key.
-2. Otherwise `https://test-api.sandbox.co.in` for `key_test_…` keys, and `https://api.sandbox.co.in` for any other key.
+1. `withHost(host)` on the builder, when given.
+2. Otherwise `SANDBOX_API_HOST`, when that environment variable is set.
+3. Otherwise `https://test-api.sandbox.co.in` for `key_test_…` keys, and `https://api.sandbox.co.in` for any other key.
+
+`client.getBaseUrl()` returns it; build request URLs from it. To call two environments from one process, build one client per environment:
+
+```ts
+import { Endpoint } from '@in-co-sandbox/api-endpoints';
+
+const uat = new ApiClientBuilder().withCredentials(uatKeys).build(ApiClient); // follows SANDBOX_API_HOST
+const prod = new ApiClientBuilder().withCredentials(prodKeys).withHost(Endpoint.live()).build(ApiClient);
+```
 
 ### Authentication
 

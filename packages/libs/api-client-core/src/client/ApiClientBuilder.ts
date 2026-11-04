@@ -34,6 +34,8 @@ export class ApiClientBuilder {
 
     private auth: ApiClientOptions['auth'];
 
+    private host: string | undefined;
+
     /** Interceptors that run after authentication, on every request. */
     public requestInterceptors: RequestInterceptor[] = [];
 
@@ -48,6 +50,7 @@ export class ApiClientBuilder {
         if (!credentials) throw new SandboxException('Credentials are required to build the ApiClient');
         return new ClientClass(credentials, this.timeout, this.enableLogging, this.requestInterceptors, {
             auth: this.auth,
+            host: this.host,
         });
     }
 
@@ -89,6 +92,18 @@ export class ApiClientBuilder {
      */
     public withRequestInterceptors(requestInterceptors: RequestInterceptor[]): ApiClientBuilder {
         this.requestInterceptors.push(...requestInterceptors);
+        return this;
+    }
+
+    /**
+     * Sets the API host this client signs in at and calls, whatever `SANDBOX_API_HOST` says.
+     *
+     * Use one client per environment to call, say, uat and production from the same process.
+     *
+     * @param host - The host, such as `https://uat1-api.sandbox.co.in` or `Endpoint.live()`.
+     */
+    public withHost(host: string): ApiClientBuilder {
+        this.host = host;
         return this;
     }
 

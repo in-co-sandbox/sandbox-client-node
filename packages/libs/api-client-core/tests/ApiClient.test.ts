@@ -116,6 +116,56 @@ describe('ApiClient authentication', () => {
     });
 });
 
+describe('ApiClientBuilder.withHost', () => {
+    let uat: FakeApi;
+    let prod: FakeApi;
+
+    beforeEach(async () => {
+        uat = await startFakeApi(() => token({ iss: '127.0.0.1', exp: inOneHour() }));
+        prod = await startFakeApi(() => token({ iss: '127.0.0.1', exp: inOneHour() }));
+    });
+
+    afterEach(async () => {
+        vi.unstubAllEnvs();
+        await Promise.all([uat.close(), prod.close()]);
+    });
+
+    const pathsOf = (api: FakeApi) => api.requests.map((request) => request.path);
+
+    it('lets two clients in one process sign in at and call different hosts', async () => {
+        // The process is configured for uat; one client still talks to production.
+        vi.stubEnv('SANDBOX_API_HOST', uat.url);
+        const uatClient = new ApiClientBuilder()
+            .withCredentials(new ApiUserCredentials('key_live_uat', 'secret'))
+            .build(ApiClient);
+        const prodClient = new ApiClientBuilder()
+            .withCredentials(new ApiUserCredentials('key_live_prod', 'secret'))
+            .withHost(`${prod.url}/`)
+            .build(ApiClient);
+
+        expect(uatClient.getBaseUrl()).toBe(uat.url);
+        expect(prodClient.getBaseUrl()).toBe(prod.url);
+
+        await uatClient.get(`${uatClient.getBaseUrl()}/pan`);
+        await prodClient.get(`${prodClient.getBaseUrl()}/eri`);
+
+        expect(pathsOf(uat)).toEqual(['/authenticate', '/pan']);
+        expect(pathsOf(prod)).toEqual(['/authenticate', '/eri']);
+        expect(uat.requests[0].headers['x-api-key']).toBe('key_live_uat');
+        expect(prod.requests[0].headers['x-api-key']).toBe('key_live_prod');
+    });
+
+    it('falls back to SANDBOX_API_HOST, then the key, without withHost', () => {
+        const credentials = new ApiUserCredentials('key_test_123', 'secret');
+
+        expect(new ApiClientBuilder().withCredentials(credentials).build(ApiClient).getBaseUrl()).toBe(
+            'https://test-api.sandbox.co.in',
+        );
+        vi.stubEnv('SANDBOX_API_HOST', uat.url);
+        expect(new ApiClientBuilder().withCredentials(credentials).build(ApiClient).getBaseUrl()).toBe(uat.url);
+    });
+});
+
 describe('ApiClientBuilder', () => {
     const timeoutOf = (client: ApiClient) =>
         (client as unknown as { client: { defaults: { timeout: number } } }).client.defaults.timeout;

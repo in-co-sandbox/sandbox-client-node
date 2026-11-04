@@ -1,3 +1,4 @@
+import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
 import {
     AxiosError,
     create as createAxios,
@@ -23,6 +24,12 @@ export interface ApiClientOptions {
      * - `false`: no authentication.
      */
     auth?: RequestInterceptor | false;
+
+    /**
+     * The API host for this client, such as `https://uat1-api.sandbox.co.in`.
+     * Omitted: `Endpoint.get(apiKey)`, which honours `SANDBOX_API_HOST`.
+     */
+    host?: string;
 }
 
 /**
@@ -42,6 +49,9 @@ export class ApiClient {
 
     protected client: AxiosInstance;
 
+    /** The API host this client signs in at and calls, without a trailing slash. */
+    protected readonly baseUrl: string;
+
     /**
      * Creates an instance of ApiClient.
      *
@@ -49,7 +59,7 @@ export class ApiClient {
      * @param timeout - The connection timeout in seconds.
      * @param enableDebugging - Whether to log every request and response.
      * @param requestInterceptors - Interceptors that run after authentication, on every request.
-     * @param options - How requests are authenticated; see {@link ApiClientOptions}.
+     * @param options - The host and how requests are authenticated; see {@link ApiClientOptions}.
      */
     constructor(
         credentials: ApiUserCredentials,
@@ -59,18 +69,27 @@ export class ApiClient {
         options: ApiClientOptions = {},
     ) {
         this.credentials = credentials;
+        this.baseUrl = (options.host ?? BaseEndpoint.get(credentials.getApiKey())).replace(/\/+$/, '');
         this.client = createAxios({ timeout: timeout * 1000 });
 
         // Axios runs request interceptors last-registered first: logging, then auth, then the caller's.
         requestInterceptors?.forEach((interceptor) => this.client.interceptors.request.use(interceptor));
 
-        const auth = options.auth ?? new AuthRequestInterceptor(credentials, timeout).intercept;
+        const auth = options.auth ?? new AuthRequestInterceptor(credentials, timeout, this.baseUrl).intercept;
         if (auth) this.client.interceptors.request.use(auth);
 
         if (enableDebugging) {
             this.client.interceptors.request.use(this.requestLoggingInterceptor.bind(this));
             this.client.interceptors.response.use(this.responseLoggingInterceptor.bind(this));
         }
+    }
+
+    /**
+     * The API host this client uses: the builder's `withHost`, else `SANDBOX_API_HOST`, else the key's environment.
+     * Build request URLs from it, so two clients in one process can call different environments.
+     */
+    public getBaseUrl(): string {
+        return this.baseUrl;
     }
 
     private async requestLoggingInterceptor(
