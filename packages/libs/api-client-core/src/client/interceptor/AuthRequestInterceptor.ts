@@ -1,4 +1,5 @@
 import { Endpoint as BaseEndpoint } from '@in-co-sandbox/api-endpoints';
+import { DateUtil } from '@org-quicko/core/utils';
 import {
     AxiosError,
     AxiosHeaders,
@@ -60,7 +61,11 @@ export class AuthRequestInterceptor {
      */
     public intercept = async (axiosConfig: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
         const config = axiosConfig;
-        if (config.url === this.authenticateUrl()) return config;
+        const authenticateUrl = EndpointBuilder.build(
+            BaseEndpoint.get(this.credentials.getApiKey()),
+            Endpoint.AUTHENTICATE,
+        );
+        if (config.url === authenticateUrl) return config;
         if (!config.headers) config.headers = new AxiosHeaders();
 
         try {
@@ -82,7 +87,10 @@ export class AuthRequestInterceptor {
     /** Returns the cached API user token, signing in when there is none or it has expired. */
     private async accessToken(): Promise<string> {
         const cached = this.session?.getAccessToken();
-        if (cached && !AuthRequestInterceptor.isExpired(cached)) return cached;
+        if (cached) {
+            const { exp } = jwtDecode(cached);
+            if (exp === undefined || exp * 1000 >= DateUtil.nowInMillis()) return cached;
+        }
         this.session = await this.authenticate();
         return this.session.getAccessToken()!;
     }
@@ -98,21 +106,27 @@ export class AuthRequestInterceptor {
         const { iss: issuer, exp } = jwtDecode(token);
         if (!issuer) throw new SandboxException('Invalid token issuer: undefined', 401);
         const issuerUrl = new URL(issuer.startsWith('http') ? issuer : `https://${issuer}`);
-        if (!AuthRequestInterceptor.isSandboxHost(issuerUrl.hostname)) {
+        // sandbox.co.in or a subdomain; not hosts that merely contain the name.
+        const { hostname } = issuerUrl;
+        if (hostname !== 'sandbox.co.in' && !hostname.endsWith('.sandbox.co.in')) {
             throw new SandboxException(`Invalid token issuer: ${issuer}`, 401);
         }
         const issuerHost = issuerUrl.host;
 
-        const expired = exp !== undefined && exp < AuthRequestInterceptor.now();
+        const expired = exp !== undefined && exp * 1000 < DateUtil.nowInMillis();
         if (!expired) return token;
-        if (issuerHost === new URL(this.baseUrl()).host) return this.accessToken();
+        if (issuerHost === new URL(BaseEndpoint.get(this.credentials.getApiKey())).host) return this.accessToken();
         throw new SandboxException(`Token has expired: ${exp}`, 401);
     }
 
     /** Signs in with the API key and secret. */
     private async authenticate(): Promise<ApiUserSession> {
         try {
-            const response = await this.authClient.post(this.authenticateUrl(), '{}', {
+            const authenticateUrl = EndpointBuilder.build(
+                BaseEndpoint.get(this.credentials.getApiKey()),
+                Endpoint.AUTHENTICATE,
+            );
+            const response = await this.authClient.post(authenticateUrl, '{}', {
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',
                     'User-Agent': AuthRequestInterceptor.USER_AGENT,
@@ -152,27 +166,5 @@ export class AuthRequestInterceptor {
         const fallback = resolvedCode === 401 ? 'Invalid api key or secret' : 'Sign-in failed';
         // SandboxException's public overload wants both; its implementation accepts them missing.
         return new SandboxException(message || fallback, resolvedCode, transactionId as string, timestamp as number);
-    }
-
-    private baseUrl(): string {
-        return BaseEndpoint.get(this.credentials.getApiKey());
-    }
-
-    private authenticateUrl(): string {
-        return EndpointBuilder.build(this.baseUrl(), Endpoint.AUTHENTICATE);
-    }
-
-    /** True for `sandbox.co.in` and its subdomains; not for hosts that merely contain the name. */
-    private static isSandboxHost(hostname: string): boolean {
-        return hostname === 'sandbox.co.in' || hostname.endsWith('.sandbox.co.in');
-    }
-
-    private static isExpired(token: string): boolean {
-        const { exp } = jwtDecode(token);
-        return exp !== undefined && exp < AuthRequestInterceptor.now();
-    }
-
-    private static now(): number {
-        return Math.floor(Date.now() / 1000);
     }
 }

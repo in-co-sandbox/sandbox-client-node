@@ -37,6 +37,7 @@
     },
     "dependencies": {
         "@in-co-sandbox/api-endpoints": "workspace:^",
+        "@org-quicko/core": "catalog:",
         "axios": "catalog:",
         "form-data": "catalog:",
         "jwt-decode": "catalog:"

@@ -32,14 +32,9 @@ export class Endpoint {
      * @returns `SANDBOX_API_HOST` when set, otherwise the host for the key's environment.
      */
     public static get(apiKey: string): string {
-        const override = Endpoint.override();
-        if (override) return override;
+        // `process` is missing outside Node.js, such as in a browser bundle.
+        const override = typeof process === 'undefined' ? undefined : process.env[Endpoint.HOST_VARIABLE]?.trim();
+        if (override) return override.replace(/\/+$/, '');
         return apiKey.split('_')[1] === 'test' ? Endpoint.TEST : Endpoint.LIVE;
-    }
-
-    /** Reads `SANDBOX_API_HOST`, without a trailing slash; undefined outside Node.js or when unset. */
-    private static override(): string | undefined {
-        const value = typeof process === 'undefined' ? undefined : process.env[Endpoint.HOST_VARIABLE]?.trim();
-        return value ? value.replace(/\/+$/, '') : undefined;
     }
 }
