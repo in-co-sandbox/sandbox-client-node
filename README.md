@@ -82,7 +82,12 @@ pnpm --filter @in-co-sandbox/kyc-api-client test:integration
 
 ## Releasing
 
-Bump a library's `version` and merge to `main`. The **Publish libraries to npm** workflow verifies the workspace and publishes any version that isn't on npm yet, with provenance. It needs an `NPM_TOKEN` secret that can publish to the `@in-co-sandbox` scope.
+To release a package, bump its `version` and merge to `main`. The **Publish to npm** workflow verifies the workspace and runs `pnpm -r publish` with provenance:
+
+- packages marked `"private": true` (everything in `tooling/`) are never published
+- a package whose version is already on npm is skipped, so only bumped packages go out
+
+It needs an `NPM_TOKEN` secret that can publish to the `@in-co-sandbox` scope.
 
 ## License
 

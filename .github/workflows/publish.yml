@@ -1,12 +1,12 @@
-name: Publish libraries to npm
+name: Publish to npm
 
+# Releasing a package = bumping its `version` and merging to main.
+# - Packages marked "private": true (everything under tooling/) are never published.
+# - pnpm skips a package whose version is already on npm, so unchanged packages stay as they are.
 on:
   push:
     branches:
       - main
-    paths:
-      - 'packages/libs/api-endpoints/**'
-      - 'packages/libs/api-client-core/**'
   workflow_dispatch:
 
 permissions:
@@ -20,7 +20,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Build & publish @in-co-sandbox/api-endpoints and api-client-core
+    name: Build & publish bumped packages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -44,11 +44,7 @@ jobs:
       - name: Verify
         run: pnpm verify
 
-      # pnpm skips a package whose version is already on npm, so only bumped versions go out.
-      # The filters keep kyc-api-client and api-client-generator out until they move to these versions.
       - name: Publish
-        run: >-
-          pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core
-          publish --access public --provenance --no-git-checks
+        run: pnpm -r publish --access public --provenance --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
