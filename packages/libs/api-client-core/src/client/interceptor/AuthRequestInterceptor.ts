@@ -42,7 +42,7 @@ export class AuthRequestInterceptor {
 
     private session: ApiUserSession | null = null;
 
-    /** The API host to sign in at, without a trailing slash. */
+    /** The API host to sign in at. */
     private readonly baseUrl: string;
 
     /** Sends only the sign-in request, so signing in never runs this interceptor again. */
@@ -55,7 +55,7 @@ export class AuthRequestInterceptor {
      */
     constructor(credentials: ApiUserCredentials, timeout: number = 30, host?: string) {
         this.credentials = credentials;
-        this.baseUrl = (host ?? BaseEndpoint.get(credentials.getApiKey())).replace(/\/+$/, '');
+        this.baseUrl = host ?? BaseEndpoint.get(credentials.getApiKey());
         this.authClient = createAxios({ timeout: timeout * 1000 });
     }
 

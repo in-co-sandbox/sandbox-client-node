@@ -12,9 +12,6 @@ export class Endpoint {
     /** Test API host, for `key_test_…` keys. */
     public static readonly TEST: string = 'https://test-api.sandbox.co.in';
 
-    /** Environment variable that overrides the host for every key. */
-    public static readonly HOST_VARIABLE: string = 'SANDBOX_API_HOST';
-
     /** @returns The production API host. */
     public static live(): string {
         return Endpoint.LIVE;
@@ -32,9 +29,7 @@ export class Endpoint {
      * @returns `SANDBOX_API_HOST` when set, otherwise the host for the key's environment.
      */
     public static get(apiKey: string): string {
-        // `process` is missing outside Node.js, such as in a browser bundle.
-        const override = typeof process === 'undefined' ? undefined : process.env[Endpoint.HOST_VARIABLE]?.trim();
-        if (override) return override.replace(/\/+$/, '');
+        if (process.env.SANDBOX_API_HOST) return process.env.SANDBOX_API_HOST;
         return apiKey.split('_')[1] === 'test' ? Endpoint.TEST : Endpoint.LIVE;
     }
 }

@@ -49,7 +49,7 @@ export class ApiClient {
 
     protected client: AxiosInstance;
 
-    /** The API host this client signs in at and calls, without a trailing slash. */
+    /** The API host this client signs in at and calls. */
     protected readonly baseUrl: string;
 
     /**
@@ -69,7 +69,7 @@ export class ApiClient {
         options: ApiClientOptions = {},
     ) {
         this.credentials = credentials;
-        this.baseUrl = (options.host ?? BaseEndpoint.get(credentials.getApiKey())).replace(/\/+$/, '');
+        this.baseUrl = options.host ?? BaseEndpoint.get(credentials.getApiKey());
         this.client = createAxios({ timeout: timeout * 1000 });
 
         // Axios runs request interceptors last-registered first: logging, then auth, then the caller's.

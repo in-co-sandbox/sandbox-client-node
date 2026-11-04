@@ -140,7 +140,7 @@ describe('ApiClientBuilder.withHost', () => {
             .build(ApiClient);
         const prodClient = new ApiClientBuilder()
             .withCredentials(new ApiUserCredentials('key_live_prod', 'secret'))
-            .withHost(`${prod.url}/`)
+            .withHost(prod.url)
             .build(ApiClient);
 
         expect(uatClient.getBaseUrl()).toBe(uat.url);
