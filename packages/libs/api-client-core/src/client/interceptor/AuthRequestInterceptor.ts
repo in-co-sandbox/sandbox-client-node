@@ -10,9 +10,16 @@ import { jwtDecode } from 'jwt-decode';
 import { ApiUserCredentials } from '../../auth/credential/ApiUserCredentials';
 import { Endpoint } from '../../auth/endpoints/Endpoint';
 import { ApiUserSession } from '../../auth/session/ApiUserSession';
-import { ApiResponse } from '../../beans/ApiResponse';
 import { SandboxException } from '../../exception/SandboxException';
 import { EndpointBuilder } from '../../utils/EndpointBuilder';
+
+/** The fields of a Sandbox API error body. */
+interface SignInErrorBody {
+    code?: unknown;
+    message?: string;
+    transaction_id?: string;
+    timestamp?: number;
+}
 
 /**
  * Authenticates every request an {@link ApiClient} sends.
@@ -114,30 +121,37 @@ export class AuthRequestInterceptor {
                     'x-api-secret': this.credentials.getApiSecret(),
                 },
             });
-            // The API can answer HTTP 200 with an error code in the body; report its code and message.
-            const body = new ApiResponse(response.data ?? {});
-            const accessToken: string | undefined = body.getData()?.access_token;
-            if (body.getCode() === 200 && accessToken) {
+            // The API can also answer HTTP 200 with an error code in the body.
+            const accessToken: string | undefined = response.data?.data?.access_token;
+            if (response.data?.code === 200 && accessToken) {
                 return new ApiUserSession(this.credentials.getApiKey()).withAccessToken(accessToken) as ApiUserSession;
             }
-            if (body.getCode() === 401) throw new SandboxException('Invalid api key or secret', 401);
-            throw new SandboxException(
-                body.getMessage() || 'Sign-in response has no access token',
-                body.getCode() || 500,
-                body.getTransactionId(),
-                response.data?.timestamp,
-            );
+            throw AuthRequestInterceptor.signInError(response.data, 500);
         } catch (error) {
             if (error instanceof SandboxException) throw error;
-            if (error instanceof AxiosError && error.response?.status === 401) {
-                throw new SandboxException('Invalid api key or secret', 401);
-            }
             if (error instanceof AxiosError && error.response) {
-                const { message, code, transaction_id: transactionId, timestamp } = error.response.data ?? {};
-                throw new SandboxException(message, code ?? error.response.status, transactionId, timestamp);
+                throw AuthRequestInterceptor.signInError(error.response.data, error.response.status);
             }
             throw new SandboxException('Internal Server Error', 500);
         }
+    }
+
+    /**
+     * Builds the error for a failed sign-in from the API's response body.
+     *
+     * Keeps the server's code, message, transaction id and timestamp, so callers see the real reason
+     * (an expired subscription, say) and can trace the request. Falls back to a default message only
+     * when the server sends none.
+     *
+     * @param body - The response body, if any.
+     * @param status - The code to use when the body has no error code: the HTTP status, or 500.
+     */
+    private static signInError(body: unknown, status: number): SandboxException {
+        const { code, message, transaction_id: transactionId, timestamp } = (body ?? {}) as SignInErrorBody;
+        const resolvedCode = typeof code === 'number' && code !== 200 ? code : status;
+        const fallback = resolvedCode === 401 ? 'Invalid api key or secret' : 'Sign-in failed';
+        // SandboxException's public overload wants both; its implementation accepts them missing.
+        return new SandboxException(message || fallback, resolvedCode, transactionId as string, timestamp as number);
     }
 
     private baseUrl(): string {

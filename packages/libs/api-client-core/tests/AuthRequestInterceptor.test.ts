@@ -1,12 +1,29 @@
-import { AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiUserCredentials, AuthRequestInterceptor } from '../src';
+import { ApiUserCredentials, AuthRequestInterceptor, SandboxException } from '../src';
 import { anHourAgo, inOneHour, token } from './server';
 
 /** An interceptor whose sign-in call answers with `body`, so no request leaves the test. */
 function interceptorWithSignInBody(body: Record<string, unknown>) {
     const interceptor = new AuthRequestInterceptor(new ApiUserCredentials('key_live_123', 'secret'));
     const post = vi.fn(async (url: string) => ({ url, data: body }));
+    (interceptor as unknown as { authClient: { post: typeof post } }).authClient.post = post;
+    return { interceptor, post };
+}
+
+/** An interceptor whose sign-in call fails the way axios does for an HTTP error `status`. */
+function interceptorWithSignInFailure(status: number, data: Record<string, unknown> | undefined) {
+    const interceptor = new AuthRequestInterceptor(new ApiUserCredentials('key_live_123', 'secret'));
+    const config = { headers: new AxiosHeaders() } as InternalAxiosRequestConfig;
+    const post = vi.fn(async () => {
+        throw new AxiosError(`Request failed with status code ${status}`, 'ERR_BAD_REQUEST', config, undefined, {
+            status,
+            statusText: '',
+            headers: {},
+            config,
+            data,
+        });
+    });
     (interceptor as unknown as { authClient: { post: typeof post } }).authClient.post = post;
     return { interceptor, post };
 }
@@ -62,13 +79,52 @@ describe('AuthRequestInterceptor', () => {
         });
     });
 
-    it('reports a 401 in the response body as invalid credentials', async () => {
-        const { interceptor } = interceptorWithSignInBody({ code: 401, message: 'Unauthorized' });
+    it("keeps the server's message for a 401 in an HTTP 200 body", async () => {
+        const { interceptor } = interceptorWithSignInBody({ code: 401, message: 'Subscription has expired' });
+
+        await expect(interceptor.intercept(request())).rejects.toMatchObject({
+            code: 401,
+            message: 'Subscription has expired',
+        });
+    });
+
+    it('keeps the code, message, transaction id and timestamp of an HTTP 401', async () => {
+        const { interceptor } = interceptorWithSignInFailure(401, {
+            code: 401,
+            message: 'Subscription has expired',
+            transaction_id: 'txn-401',
+            timestamp: 123456789,
+        });
+
+        const error = await interceptor.intercept(request()).catch((caught: unknown) => caught);
+
+        expect(error).toBeInstanceOf(SandboxException);
+        expect(error).toMatchObject({ code: 401, message: 'Subscription has expired', transactionId: 'txn-401' });
+        expect((error as SandboxException).getTimestamp()).toBe(123456789);
+    });
+
+    it('falls back to "Invalid api key or secret" for a 401 without a message', async () => {
+        const { interceptor } = interceptorWithSignInFailure(401, undefined);
 
         await expect(interceptor.intercept(request())).rejects.toMatchObject({
             code: 401,
             message: 'Invalid api key or secret',
         });
+    });
+
+    it('uses the HTTP status when the error body has no code', async () => {
+        const { interceptor } = interceptorWithSignInFailure(503, { message: 'Down for maintenance' });
+
+        await expect(interceptor.intercept(request())).rejects.toMatchObject({
+            code: 503,
+            message: 'Down for maintenance',
+        });
+    });
+
+    it('reports a 200 without an access token as a 500', async () => {
+        const { interceptor } = interceptorWithSignInBody({ code: 200, data: {} });
+
+        await expect(interceptor.intercept(request())).rejects.toMatchObject({ code: 500, message: 'Sign-in failed' });
     });
 
     it('accepts sandbox.co.in issuers and rejects hosts that only contain the name', async () => {
