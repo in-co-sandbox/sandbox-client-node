@@ -1,37 +1,51 @@
 {
     "name": "@in-co-sandbox/api-endpoints",
-    "version": "1.0.0",
-    "description": "Endpoints for Sandbox APIs",
-    "main": "dist/index.js",
+    "version": "2.0.0",
     "type": "module",
-    "types": "dist/src/index.d.ts",
-    "engines": {
-        "node": ">=18.0.0"
-    },
+    "description": "Base URLs of the Sandbox API",
     "homepage": "https://sandbox.co.in",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/in-co-sandbox/sandbox-client-node.git",
+        "directory": "packages/libs/api-endpoints"
+    },
+    "license": "ISC",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "files": [
         "dist/**/*"
     ],
-    "scripts": {
-        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
-        "build": "rollup -c",
-        "clean": "rimraf dist",
-        "lint": "eslint --fix .",
-        "lint:check": "eslint .",
-        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
-        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\""
-    },
-    "typesVersions": {
-        "*": {
-            ".": [
-                "./dist/src/index.d.ts"
-            ]
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
         }
     },
-    "license": "ISC",
-    "repository": {
-        "type": "git",
-        "url": "org.quicko",
-        "directory": "packages/api-endpoints"
+    "engines": {
+        "node": ">=22.0.0"
+    },
+    "scripts": {
+        "clean": "sandbox-clean",
+        "build": "sandbox-rollup lib",
+        "test": "vitest run",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@in-co-sandbox/rollup-config": "workspace:*",
+        "@in-co-sandbox/typescript-config": "workspace:*",
+        "@in-co-sandbox/vitest-config": "workspace:*",
+        "@types/node": "catalog:",
+        "oxfmt": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "rollup": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

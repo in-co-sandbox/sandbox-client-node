@@ -120,14 +120,14 @@ export class OcrApiClient extends ApiClient {
             }
 
             return apiResponse;
-        } catch (error: any) {
+        } catch (error: unknown) {
             if (error instanceof SandboxException) {
                 throw error;
             }
             if (error instanceof AxiosError) {
                 throw new SandboxException(error.response?.data.message || error.message, error.status || 500);
             }
-            throw new SandboxException(error.message);
+            throw new SandboxException(error instanceof Error ? error.message : String(error));
         }
     }
 
@@ -137,8 +137,9 @@ export class OcrApiClient extends ApiClient {
      * @param obj - The object to check.
      * @returns True if the object is a NodeJS.ReadableStream.
      */
-    private isReadableStream(obj: any): obj is NodeJS.ReadableStream {
-        return obj && typeof obj.on === 'function' && typeof obj.read === 'function';
+    private isReadableStream(obj: unknown): obj is NodeJS.ReadableStream {
+        const candidate = obj as Partial<NodeJS.ReadableStream> | null;
+        return !!candidate && typeof candidate.on === 'function' && typeof candidate.read === 'function';
     }
 
     /**
@@ -147,7 +148,7 @@ export class OcrApiClient extends ApiClient {
      * @param obj - The object to check.
      * @returns True if the object is a FormData instance.
      */
-    private isFormData(obj: any): obj is FormData {
+    private isFormData(obj: unknown): obj is FormData {
         return obj instanceof FormData;
     }
 

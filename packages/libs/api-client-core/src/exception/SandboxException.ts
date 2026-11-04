@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-explicit-any -- error details are JSON of any shape */
 /**
  * Custom exception class for Sandbox API errors.
  */
@@ -48,9 +49,6 @@ export class SandboxException extends Error {
         this.code = code || 0;
         this.transactionId = transactionId;
         this.timestamp = timestamp;
-
-        // Log the error
-        console.error(message);
     }
 
     /**

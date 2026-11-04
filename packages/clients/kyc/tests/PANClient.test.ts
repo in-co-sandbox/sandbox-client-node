@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { ApiUserCredentials } from '@in-co-sandbox/api-client-core';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { PANClient } from '../src/kyc/pan/client/PANClient';
-import { VerifyPanRequest } from '../src/kyc/pan/schemas/request/VerifyPanRequest';
 import { VerifyPanAadhaarLinkStatusRequest } from '../src/kyc/pan/schemas/request/VerifyPanAadhaarLinkStatusRequest';
+import { VerifyPanRequest } from '../src/kyc/pan/schemas/request/VerifyPanRequest';
 
 describe('PANClient', () => {
     // Test constants

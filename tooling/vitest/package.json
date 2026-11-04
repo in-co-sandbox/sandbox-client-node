@@ -1,0 +1,41 @@
+{
+    "name": "@in-co-sandbox/vitest-config",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "description": "Shared Vitest configuration for the Sandbox Node.js packages.",
+    "license": "ISC",
+    "engines": {
+        "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
+    },
+    "files": [
+        "src",
+        "dist",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\" && tsc -p tsconfig.build.json",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./src/index.js"
+        }
+    },
+    "devDependencies": {
+        "@in-co-sandbox/typescript-config": "workspace:*",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "oxfmt": "catalog:",
+        "vitest": "catalog:",
+        "vite": "catalog:"
+    },
+    "peerDependencies": {
+        "vitest": "^5.0.5",
+        "vite": "^8.3.5"
+    }
+}

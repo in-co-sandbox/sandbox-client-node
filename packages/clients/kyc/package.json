@@ -6,22 +6,20 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "engines": {
-        "node": ">=18.0.0"
+        "node": ">=22.0.0"
     },
     "homepage": "https://sandbox.co.in",
     "files": [
         "dist/**/*"
     ],
     "scripts": {
-        "test": "vitest run",
-        "prebuild": "npm run clean && npm run format:check && tsc --noEmit",
-        "build": "rollup -c",
-        "clean": "rimraf dist",
-        "lint": "eslint --fix .",
-        "lint:check": "eslint .",
-        "format": "prettier --write \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
-        "format:check": "prettier --check \"./**/*.+(js|jsx|ts|tsx|json|css|scss|md)\"",
-        "generate": "npx openapi-to-client ./resources/json/in-co-sandbox-kyc.openapi.json -o generated --generate-tests"
+        "clean": "sandbox-clean",
+        "build": "sandbox-rollup lib",
+        "typecheck": "tsc --noEmit",
+        "lint": "oxlint",
+        "lint:fix": "oxlint --fix",
+        "test:integration": "vitest run",
+        "generate": "openapi-to-client ./resources/json/in-co-sandbox-kyc.openapi.json -o generated --generate-tests"
     },
     "exports": {
         "./aadhaar": {
@@ -60,10 +58,29 @@
     "license": "ISC",
     "dependencies": {
         "@in-co-sandbox/api-client-core": "1.0.0",
-        "@in-co-sandbox/api-endpoints": "1.0.0"
+        "@in-co-sandbox/api-endpoints": "1.0.0",
+        "zod": "catalog:"
     },
     "devDependencies": {
-        "@in-co-sandbox/api-client-generator": "1.0.0",
-        "vitest": "4.0.18"
+        "@in-co-sandbox/api-client-generator": "workspace:*",
+        "@in-co-sandbox/vitest-config": "workspace:*",
+        "@in-co-sandbox/rollup-config": "workspace:*",
+        "@in-co-sandbox/typescript-config": "workspace:*",
+        "@types/node": "catalog:",
+        "oxfmt": "catalog:",
+        "oxlint": "catalog:",
+        "oxlint-tsgolint": "catalog:",
+        "rollup": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/in-co-sandbox/sandbox-client-node.git",
+        "directory": "packages/clients/kyc"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }

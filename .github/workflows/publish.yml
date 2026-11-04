@@ -1,0 +1,54 @@
+name: Publish libraries to npm
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/libs/api-endpoints/**'
+      - 'packages/libs/api-client-core/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # npm provenance: links each published version to this workflow run.
+  id-token: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build & publish @in-co-sandbox/api-endpoints and api-client-core
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify
+        run: pnpm verify
+
+      # pnpm skips a package whose version is already on npm, so only bumped versions go out.
+      # The filters keep kyc-api-client and api-client-generator out until they move to these versions.
+      - name: Publish
+        run: >-
+          pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core
+          publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

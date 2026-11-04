@@ -1,0 +1,20 @@
+{
+    "name": "@in-co-sandbox/typescript-config",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Shared TypeScript compiler settings for the Sandbox Node.js packages.",
+    "license": "ISC",
+    "files": [
+        "base.json",
+        "build.json",
+        "README.md"
+    ],
+    "exports": {
+        "./base.json": "./base.json",
+        "./build.json": "./build.json"
+    },
+    "scripts": {},
+    "peerDependencies": {
+        "typescript": "7.1.0-beta"
+    }
+}

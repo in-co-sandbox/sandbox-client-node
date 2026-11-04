@@ -44,7 +44,7 @@ export class ResourceOwnerSession extends Session {
      * @returns The session
      */
 
-    public withRefreshToken(refreshToken: string): Session {
+    public withRefreshToken(_refreshToken: string): Session {
         // Resource owner session doesn't use refresh tokens
         return this;
     }
