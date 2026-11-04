@@ -29,7 +29,7 @@ interface SignInErrorBody {
  *   signs in again once the token expires.
  * - With an `Authorization` header, it keeps a resource owner's token and refreshes an expired API user token.
  *
- * `ApiClient` attaches one to every client, signing in at the client's host.
+ * `ApiClient` attaches one to every client. It signs in at `Endpoint.get(apiKey)`.
  */
 export class AuthRequestInterceptor {
     /** The user agent sent with every request. */
@@ -51,11 +51,10 @@ export class AuthRequestInterceptor {
     /**
      * @param credentials - The API key and secret to sign in with.
      * @param timeout - The sign-in request timeout, in seconds.
-     * @param host - The API host to sign in at. Omitted: `Endpoint.get(apiKey)`, which honours `SANDBOX_API_HOST`.
      */
-    constructor(credentials: ApiUserCredentials, timeout: number = 30, host?: string) {
+    constructor(credentials: ApiUserCredentials, timeout: number = 30) {
         this.credentials = credentials;
-        this.baseUrl = host ?? BaseEndpoint.get(credentials.getApiKey());
+        this.baseUrl = BaseEndpoint.get(credentials.getApiKey());
         this.authClient = createAxios({ timeout: timeout * 1000 });
     }
 

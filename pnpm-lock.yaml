@@ -321,7 +321,7 @@ importers:
   packages/libs/api-client-core:
     dependencies:
       '@in-co-sandbox/api-endpoints':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../api-endpoints
       '@org-quicko/core':
         specifier: 'catalog:'

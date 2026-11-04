@@ -1,7 +1,7 @@
 import type { ApiUserCredentials } from '../auth/credential/ApiUserCredentials';
 import { ApiUserCredentialProvider } from '../auth/provider/ApiUserCredentialProvider';
 import { SandboxException } from '../exception/SandboxException';
-import type { ApiClient, ApiClientOptions } from './ApiClient';
+import type { ApiClient } from './ApiClient';
 import type { RequestInterceptor } from './interceptor/RequestInterceptor';
 import type { OcrApiClient } from './OcrApiClient';
 
@@ -11,7 +11,6 @@ export type ApiClientConstructor<T extends ApiClient | OcrApiClient> = new (
     timeout: number,
     enableDebugging: boolean,
     requestInterceptors: RequestInterceptor[],
-    options?: ApiClientOptions,
 ) => T;
 
 /**
@@ -32,8 +31,6 @@ export class ApiClientBuilder {
 
     private enableLogging: boolean = ApiClientBuilder.ENABLE_LOGGING;
 
-    private host: string | undefined;
-
     /** Interceptors that run after authentication, on every request. */
     public requestInterceptors: RequestInterceptor[] = [];
 
@@ -46,9 +43,7 @@ export class ApiClientBuilder {
     public build<T extends ApiClient | OcrApiClient>(ClientClass: ApiClientConstructor<T>): T {
         const credentials = this.credentialProvider?.getCredentials();
         if (!credentials) throw new SandboxException('Credentials are required to build the ApiClient');
-        return new ClientClass(credentials, this.timeout, this.enableLogging, this.requestInterceptors, {
-            host: this.host,
-        });
+        return new ClientClass(credentials, this.timeout, this.enableLogging, this.requestInterceptors);
     }
 
     /**
@@ -89,18 +84,6 @@ export class ApiClientBuilder {
      */
     public withRequestInterceptors(requestInterceptors: RequestInterceptor[]): ApiClientBuilder {
         this.requestInterceptors.push(...requestInterceptors);
-        return this;
-    }
-
-    /**
-     * Sets the API host this client signs in at and calls, whatever `SANDBOX_API_HOST` says.
-     *
-     * Use one client per environment to call, say, uat and production from the same process.
-     *
-     * @param host - The host, such as `https://uat1-api.sandbox.co.in` or `Endpoint.live()`.
-     */
-    public withHost(host: string): ApiClientBuilder {
-        this.host = host;
         return this;
     }
 }

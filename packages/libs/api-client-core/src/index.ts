@@ -1,6 +1,5 @@
 // Export client classes
 export { ApiClient } from './client/ApiClient';
-export type { ApiClientOptions } from './client/ApiClient';
 export { ApiClientBuilder } from './client/ApiClientBuilder';
 export type { ApiClientConstructor } from './client/ApiClientBuilder';
 export { OcrApiClient } from './client/OcrApiClient';

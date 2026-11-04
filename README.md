@@ -21,30 +21,18 @@ npm install @in-co-sandbox/api-client-core
 
 ```ts
 import { ApiClient, ApiClientBuilder, ApiUserCredentials } from '@in-co-sandbox/api-client-core';
+import { Endpoint } from '@in-co-sandbox/api-endpoints';
 
 const credentials = new ApiUserCredentials(process.env.SANDBOX_API_KEY!, process.env.SANDBOX_API_SECRET!);
 const client = new ApiClientBuilder().withCredentials(credentials).build(ApiClient);
 
 // Signs in on the first request, then reuses the access token until it expires.
-const response = await client.get(`${client.getBaseUrl()}/some/path`);
+const response = await client.get(`${Endpoint.get(credentials.getApiKey())}/some/path`);
 ```
 
 ### Which host is called
 
-Each client picks its host when it's built, and signs in at and calls that host:
-
-1. `withHost(host)` on the builder, when given.
-2. Otherwise `SANDBOX_API_HOST`, when that environment variable is set.
-3. Otherwise `https://test-api.sandbox.co.in` for `key_test_…` keys, and `https://api.sandbox.co.in` for any other key.
-
-`client.getBaseUrl()` returns it; build request URLs from it. To call two environments from one process, build one client per environment:
-
-```ts
-import { Endpoint } from '@in-co-sandbox/api-endpoints';
-
-const uat = new ApiClientBuilder().withCredentials(uatKeys).build(ApiClient); // follows SANDBOX_API_HOST
-const prod = new ApiClientBuilder().withCredentials(prodKeys).withHost(Endpoint.live()).build(ApiClient);
-```
+`Endpoint.get(apiKey)` picks the host: `https://test-api.sandbox.co.in` for `key_test_…` keys, and `https://api.sandbox.co.in` for any other key. Clients sign in at and call that host. The libraries read no environment variables.
 
 ### Authentication
 
@@ -83,6 +71,22 @@ To release a package, bump its `version` and merge to `main`. The **Publish to n
 - a package whose version is already on npm is skipped, so only bumped packages go out
 
 It needs an `NPM_TOKEN` secret that can publish to the `@in-co-sandbox` scope.
+
+### Internal builds
+
+Sandbox's own services use builds of `api-endpoints` and `api-client-core` pinned to an internal API host, versioned like `2.0.0-dev` and `2.0.0-uat`. They go to the internal registry, by hand, never to npm:
+
+```bash
+pnpm install
+node scripts/publish-internal.mjs 2.0.0-dev <dev api host> <internal registry>
+```
+
+`api-client-core` depends on its exact `api-endpoints` version, so `api-client-core@2.0.0-dev` always calls the dev host. To call two environments from one process, install both under aliases:
+
+```json
+"@in-co-sandbox/api-client-core": "2.0.0",
+"@in-co-sandbox/api-client-core-dev": "npm:@in-co-sandbox/api-client-core@2.0.0-dev"
+```
 
 ## License
 

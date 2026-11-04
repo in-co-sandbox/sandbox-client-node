@@ -1,5 +1,5 @@
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ApiUserCredentials, AuthRequestInterceptor, SandboxException } from '../src';
 import { anHourAgo, inOneHour, token } from './server';
 
@@ -40,23 +40,18 @@ const request = (authorization?: string): InternalAxiosRequestConfig => {
 };
 
 describe('AuthRequestInterceptor', () => {
-    afterEach(() => {
-        vi.unstubAllEnvs();
-    });
-
     it('refreshes an expired API user token issued by the API host', async () => {
-        vi.stubEnv('SANDBOX_API_HOST', 'https://dev-api.sandbox.co.in');
-        const fresh = token({ iss: 'dev-api.sandbox.co.in', exp: inOneHour() });
+        const fresh = token({ iss: 'api.sandbox.co.in', exp: inOneHour() });
         const { interceptor, post } = interceptorWithSignIn(fresh);
 
-        const stale = token({ iss: 'dev-api.sandbox.co.in', exp: anHourAgo() });
+        const stale = token({ iss: 'api.sandbox.co.in', exp: anHourAgo() });
         const config = await interceptor.intercept(request(stale));
 
         expect(config.headers.Authorization).toBe(fresh);
-        expect(post).toHaveBeenCalledWith('https://dev-api.sandbox.co.in/authenticate', '{}', expect.anything());
+        expect(post).toHaveBeenCalledWith('https://api.sandbox.co.in/authenticate', '{}', expect.anything());
     });
 
-    it('signs in at the live host without SANDBOX_API_HOST', async () => {
+    it('signs in at the live host for a live key', async () => {
         const { interceptor, post } = interceptorWithSignIn(token({ iss: 'api.sandbox.co.in', exp: inOneHour() }));
 
         await interceptor.intercept(request());
