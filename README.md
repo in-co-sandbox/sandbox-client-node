@@ -76,9 +76,14 @@ It needs an `NPM_TOKEN` secret that can publish to the `@in-co-sandbox` scope.
 
 Sandbox's own services use builds of `api-endpoints` and `api-client-core` pinned to an internal API host, versioned like `2.0.0-dev` and `2.0.0-uat`. They go to the internal registry, by hand, never to npm:
 
+1. Set `HOST` in `packages/libs/api-endpoints/src/endpoint/host.ts` to the internal host.
+2. Set `version` to `2.0.0-dev` in both packages' `package.json`.
+3. Build and publish, then discard the edits:
+
 ```bash
-pnpm install
-node scripts/publish-internal.mjs 2.0.0-dev <dev api host> <internal registry>
+pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core run build
+pnpm -r --filter @in-co-sandbox/api-endpoints --filter @in-co-sandbox/api-client-core publish --registry <internal registry> --tag dev --no-git-checks
+git checkout -- packages/libs
 ```
 
 `api-client-core` depends on its exact `api-endpoints` version, so `api-client-core@2.0.0-dev` always calls the dev host. To call two environments from one process, install both under aliases:
